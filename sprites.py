@@ -38,12 +38,12 @@ class Player():
             line = []
             self.sprite_table.append(line)
             for tile_y in range(0, rows):
-                rect = (tile_x * 2, tile_y * 2, SPRITE_SIZE, SPRITE_SIZE) # tiles x&y * 2 ==> TILE_SIZE * 2 = SPRITE_SIZE
+                rect = (tile_x * SPRITE_SIZE, tile_y * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE) # tiles x&y * 2 ==> TILE_SIZE * 2 = SPRITE_SIZE
                 line.append(image.subsurface(rect))
     
 # Fonction de récup. de tile, tout est dans le nom
     def get_sprite(self, x_char=1, y_char=10):
-        return self.sprite_table[x_char-1][y_char-1]
+        return self.sprite_table[x_char - 1][y_char - 1]
 
 # Dessiner le character sur l'écran (.blit)
     def draw_sprite(self):
@@ -68,13 +68,13 @@ class Player():
 
     def animation(self):
         if self.player_facing == 'up':
-            self.facing_sprite = 8
-        elif self.player_facing == 'left':
             self.facing_sprite = 9
-        elif self.player_facing == 'down':
+        elif self.player_facing == 'left':
             self.facing_sprite = 10
-        elif self.player_facing == 'right':
+        elif self.player_facing == 'down':
             self.facing_sprite = 11
+        elif self.player_facing == 'right':
+            self.facing_sprite = 12
 
 
     def movements(self):
