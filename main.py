@@ -11,7 +11,7 @@ class Game:
         pygame.init()
         self.window = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT + LOWER_MARGIN))
         self.screen = pygame.rect.Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
-        self.window.fill(pygame.Color(215, 132, 28, 60))
+        self.window.fill(pygame.Color(195, 142, 50, 60))
         self.clock = pygame.time.Clock()
         self.running = True
 
@@ -25,21 +25,21 @@ class Game:
 
     def new_game(self):
         self.playing = True
-        self.all_sprites = pygame.sprite.LayeredUpdates()
-        self.player = Player(self, 4, 2)
+        self.player = Player(0,10)
 
     def draw_window(self):
         self.window.fill(pygame.Color(0,0,0), self.screen)
-
-        if self.keys[pygame.K_r]:
-            self.random_tiles()
 
         for i in range(self.screen.left, self.screen.right, TILE_SIZE):
             for j in range(self.screen.top, self.screen.bottom, TILE_SIZE):
                 self.window.blit(self.tiles.get_tile(8, 2), (i, j))
 
+        if self.keys[pygame.K_r]:
+            self.random_tiles()
+
         # Load ALL Sprite at the very end ==> else : will not appear on screen
-        self.all_sprites.draw(self.window)
+        self.player.update()
+        self.player.draw_sprite()
         # ___________________________________
 
         pygame.display.flip()
@@ -51,14 +51,14 @@ class Game:
                 self.playing = False
                 self.running = False
                 pygame.quit()
-                quit()
         
         self.keys = pygame.key.get_pressed()
 
     # Update the game state based on user input and object behavior
     def update(self):
-        self.all_sprites.update()
-        pygame.display.set_caption("{:.2f} FPS".format(self.clock.get_fps()))
+        
+        #pygame.display.set_caption("{:.2f} FPS".format(self.clock.get_fps()))
+        pass
 
     # Main game loop
     def main(self):
