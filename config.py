@@ -34,7 +34,8 @@ GROUND_LAYER = 0
 #                    Movements and Charcaters                     #
 #                                                                 #
 ###################################################################
-PLAYER_SPEED = 4
+PLAYER_SPEED = 2
+PLAYER_RUN = 5
 
 PLAYER_CHARACTER = 'knight'
 

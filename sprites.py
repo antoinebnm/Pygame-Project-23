@@ -9,6 +9,8 @@ game_screen = pygame.surface.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
 class Player():
     def __init__(self, x, y):
         self._layer = PLAYER_LAYER
+        self.sprite_animation = 'stand'
+        self.num_tileset = 0
 
         self.x = x * TILE_SIZE
         self.y= y * TILE_SIZE
@@ -21,6 +23,7 @@ class Player():
         self.x_move = 0
         self.y_move = 0
         self.player_facing = "down"
+        self.sprite_frame = 1
         self.facing_sprite = 10
 
 # à changer / automatiser avec interface
@@ -28,7 +31,7 @@ class Player():
 
 # Chargement tileset du chararcter / à automatiser avec interface
     def load_player_sprite(self, sprite_name=PLAYER_CHARACTER):
-        self.player_sprites = self.load_sprites((sprite_name + '.png'), 832, 1344)
+        self.player_sprites = self.load_sprites((sprite_name + '_' + str(self.num_tileset) + '.png'), 832, 1344)
 
 # Suite du chargement et mise en variable
     def load_sprites(self, filename, width, height, rows = 21, cols = 13):
@@ -47,13 +50,13 @@ class Player():
 
 # Dessiner le character sur l'écran (.blit)
     def draw_sprite(self):
-        self.player_sprite = self.get_sprite(1, self.facing_sprite)
+        self.player_sprite = self.get_sprite(self.sprite_frame, self.facing_sprite)
 
 
 # FONCTION UPDATE / récurrence
-    def update(self):
+    def update(self, COUNTER):
         self.movements()
-        self.animation()
+        self.animation(COUNTER)
         
 # pos_move calculé par .movements()
         self.x += self.x_move
@@ -66,16 +69,48 @@ class Player():
         self.y_move = 0
 
 
-    def animation(self):
-        if self.player_facing == 'up':
-            self.facing_sprite = 9
-        elif self.player_facing == 'left':
-            self.facing_sprite = 10
-        elif self.player_facing == 'down':
-            self.facing_sprite = 11
-        elif self.player_facing == 'right':
-            self.facing_sprite = 12
+    def animation(self, COUNTER):
+        if self.sprite_animation == 'walk':
+            if self.player_facing == 'up':
+                self.facing_sprite = 9
+            elif self.player_facing == 'left':
+                self.facing_sprite = 10
+            elif self.player_facing == 'down':
+                self.facing_sprite = 11
+            elif self.player_facing == 'right':
+                self.facing_sprite = 12
+        elif self.sprite_animation == 'stand':
+            if self.player_facing == 'up':
+                self.facing_sprite = 1
+            elif self.player_facing == 'left':
+                self.facing_sprite = 2
+            elif self.player_facing == 'down':
+                self.facing_sprite = 3
+            elif self.player_facing == 'right':
+                self.facing_sprite = 4
 
+        keys = pygame.key.get_pressed()
+
+        if (keys[PLAYER_LEFT_KEY] or keys[PLAYER_RIGHT_KEY] or keys[PLAYER_UP_KEY] or keys[PLAYER_DOWN_KEY]):
+            self.sprite_animation = 'walk'
+        else:
+            self.sprite_animation = 'stand'
+
+        self.animate_frames(COUNTER)
+
+    def animate_frames(self, COUNTER):
+        if self.sprite_animation == 'walk':
+            if (self.sprite_frame < 9):
+                if ((COUNTER % 6)==0):
+                    self.sprite_frame += 1
+            else:
+                self.sprite_frame = 1
+        if self.sprite_animation == 'stand':
+            if (self.sprite_frame < 3):
+                if ((COUNTER % 30)==0):
+                    self.sprite_frame += 1
+            else:
+                self.sprite_frame = 1
 
     def movements(self):
         keys = pygame.key.get_pressed()

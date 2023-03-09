@@ -16,6 +16,7 @@ class Game:
         self.window.fill(pygame.Color(180, 120, 60))
         self.clock = pygame.time.Clock()
         self.running = True
+        self.COUNTER = 0
 
         self.tiles = Tilesheet('tilemap.png', 1024, 2016, 63, 32)
 
@@ -40,16 +41,16 @@ class Game:
         self.window.fill(pygame.Color(0,0,0), self.screen)
 
 # Draw tilemap on screen
-        #for i in range(self.screen.left, self.screen.right, TILE_SIZE):
-        #    for j in range(self.screen.top, self.screen.bottom, TILE_SIZE):
-        #        self.window.blit(self.tiles.get_tile(8, 2), (i, j))
+        for i in range(self.screen.left, self.screen.right, TILE_SIZE):
+            for j in range(self.screen.top, self.screen.bottom, TILE_SIZE):
+                self.window.blit(self.tiles.get_tile(8, 2), (i, j))
 
 # Random function ==> pour le fun (epilepsie)
         if self.keys[pygame.K_r]:
             self.random_tiles()
 
         # Load ALL Sprite at the very end ==> else : will not appear on screen
-        self.player.update()
+        self.player.update(self.COUNTER)
         self.window.blit(self.player.player_sprite, (self.player.x, self.player.y))
         # ___________________________________
 
@@ -75,6 +76,8 @@ class Game:
     def main(self):
 
         while self.playing:
+            self.COUNTER += 1
+            
             self.events()
             self.update()
 
