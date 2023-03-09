@@ -1,0 +1,43 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "inn.tmx",
+    "expandedProjectPaths": [
+    ],
+    "fileStates": {
+        "inn.tmx": {
+            "scale": 0.8312499999999999,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 320.60150375939855,
+                "y": 192.48120300751881
+            }
+        },
+        "tilemap.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        }
+    },
+    "last.exportedFilePath": "/Users/antoinebnm/Desktop/ISEP/Informatique/Game",
+    "last.imagePath": "/Users/antoinebnm/Desktop/ISEP/Informatique/Game",
+    "map.height": 12,
+    "map.lastUsedExportFilter": "Fichiers CSV (*.csv)",
+    "map.lastUsedFormat": "tmx",
+    "map.width": 20,
+    "openFiles": [
+        "tilemap.tsx",
+        "inn.tmx"
+    ],
+    "project": "tilemap.tiled-project",
+    "recentFiles": [
+        "tilemap.tsx",
+        "inn.tmx"
+    ],
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.tileSize": {
+        "height": 32,
+        "width": 32
+    }
+}
