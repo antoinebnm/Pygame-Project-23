@@ -1,6 +1,7 @@
 import pygame, random, math, sys
 from config import *
 
+# Définition du chemin d'accès (absolu)
 path = os.path.dirname(__file__) + "/sprites/"
 screen = pygame.rect.Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
 game_screen = pygame.surface.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -14,50 +15,58 @@ class Player():
         self.w = TILE_SIZE
         self.h = TILE_SIZE
 
+# Var de position x, y du joueur
         self.player_pos = (self.x, self.y)
 
         self.x_move = 0
         self.y_move = 0
         self.player_facing = "down"
+        self.facing_sprite = 10
 
+# à changer / automatiser avec interface
         self.load_player_sprite('knight')
 
+# Chargement tileset du chararcter / à automatiser avec interface
     def load_player_sprite(self, sprite_name=PLAYER_CHARACTER):
         self.player_sprites = self.load_sprites((sprite_name + '.png'), 832, 1344)
 
-    def load_sprites(self, filename, width, height):
-        rows = width // SPRITE_SIZE
-        cols = height // SPRITE_SIZE
+# Suite du chargement et mise en variable
+    def load_sprites(self, filename, width, height, rows = 21, cols = 13):
         image = pygame.image.load((path + filename)).convert()
         self.sprite_table = []
         for tile_x in range(0, cols):
             line = []
             self.sprite_table.append(line)
             for tile_y in range(0, rows):
-                rect = (tile_x * TILE_SIZE, tile_y * TILE_SIZE, SPRITE_SIZE, SPRITE_SIZE)
+                rect = (tile_x * 2, tile_y * 2, SPRITE_SIZE, SPRITE_SIZE)
                 line.append(image.subsurface(rect))
     
+# Fonction de récup. de tile, tout est dans le nom
     def get_sprite(self, x_char=1, y_char=10):
         return self.sprite_table[x_char][y_char]
 
+# Dessiner le character sur l'écran (.blit)
     def draw_sprite(self):
-        x = self.x
-        y = self.y
         self.player_sprite = self.get_sprite(0, self.facing_sprite)
-        game_screen.blit(self.player_sprite, (x * SPRITE_SIZE, y * SPRITE_SIZE))
+        game_screen.blit(self.player_sprite, (self.x * SPRITE_SIZE, self.y * SPRITE_SIZE))
 
+
+# FONCTION UPDATE / récurrence
     def update(self):
-        self.load_player_sprite()
+        self.load_sprites((PLAYER_CHARACTER + '.png'), 832, 1344)
         self.movements()
         self.animation()
         
+# pos_move calculé par .movements()
         self.x += self.x_move
         self.y += self.y_move
 
+# redraw du sprite après check de l'animation
         self.draw_sprite()
 
         self.x_move = 0
         self.y_move = 0
+
 
     def animation(self):
         if self.player_facing == 'up':

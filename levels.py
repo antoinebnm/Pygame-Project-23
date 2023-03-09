@@ -23,7 +23,3 @@ class Levels:
             if ((file.startswith(LevelNameStart)) and (file.endswith(LevelNameEnd))):
                 self.layers.append(file)
         return self.layers
-
-#l = Levels('inn')
-#print(l.maps_founder())
-#print(l.layer_founder('inn').index('inn'+'_Ground'+'.csv'))

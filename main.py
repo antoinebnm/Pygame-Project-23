@@ -1,5 +1,6 @@
 import pygame, random, sys
 from tilesheet import *
+from levels import *
 from sprites import *
 from config import *
 
@@ -11,7 +12,7 @@ class Game:
         pygame.init()
         self.window = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT + LOWER_MARGIN))
         self.screen = pygame.rect.Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
-        self.window.fill(pygame.Color(195, 142, 50, 60))
+        self.window.fill(pygame.Color(180, 120, 60, 60))
         self.clock = pygame.time.Clock()
         self.running = True
 
@@ -23,23 +24,32 @@ class Game:
             for j in range(self.screen.top, self.screen.bottom, TILE_SIZE):
                 self.window.blit(self.tiles.get_tile(random.randint(0,31), random.randint(0,62)), (i, j))
 
+### Fonction initialisation d'une nouvelle partie
     def new_game(self):
         self.playing = True
-        self.player = Player(0,10)
+        self.player = Player(1,1)
 
+        level = Levels('inn')
+        layer = 'Ground'
+        self.map_layer = level.layer_founder(level.map).index(level.map + '_' + layer + '.csv')
+
+
+### Fonction récurente pour actualiser l'écran
     def draw_window(self):
         self.window.fill(pygame.Color(0,0,0), self.screen)
 
+# Draw tilemap on screen
         for i in range(self.screen.left, self.screen.right, TILE_SIZE):
             for j in range(self.screen.top, self.screen.bottom, TILE_SIZE):
                 self.window.blit(self.tiles.get_tile(8, 2), (i, j))
 
+# Random function ==> pour le fun (epilepsie)
         if self.keys[pygame.K_r]:
             self.random_tiles()
 
         # Load ALL Sprite at the very end ==> else : will not appear on screen
-        self.player.update()
         self.player.draw_sprite()
+        self.player.update()
         # ___________________________________
 
         pygame.display.flip()
