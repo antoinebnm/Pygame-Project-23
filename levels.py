@@ -1,6 +1,7 @@
 import pygame, random, csv, os
 from config import *
 
+# Chargement du chemin d'accès absolu en variable globale
 path = os.path.dirname(__file__) + "/levels/"
 
 class Levels:

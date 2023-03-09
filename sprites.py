@@ -1,7 +1,7 @@
 import pygame, random, math, sys
 from config import *
 
-# Définition du chemin d'accès (absolu)
+# Chargement du chemin d'accès absolu en variable globale
 path = os.path.dirname(__file__) + "/sprites/"
 screen = pygame.rect.Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
 game_screen = pygame.surface.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -24,7 +24,7 @@ class Player():
         self.facing_sprite = 10
 
 # à changer / automatiser avec interface
-        self.load_player_sprite('knight')
+        self.load_player_sprite()
 
 # Chargement tileset du chararcter / à automatiser avec interface
     def load_player_sprite(self, sprite_name=PLAYER_CHARACTER):
@@ -32,28 +32,26 @@ class Player():
 
 # Suite du chargement et mise en variable
     def load_sprites(self, filename, width, height, rows = 21, cols = 13):
-        image = pygame.image.load((path + filename)).convert()
+        image = pygame.image.load((path + filename)).convert() # Save des perfs, add .convert()
         self.sprite_table = []
         for tile_x in range(0, cols):
             line = []
             self.sprite_table.append(line)
             for tile_y in range(0, rows):
-                rect = (tile_x * 2, tile_y * 2, SPRITE_SIZE, SPRITE_SIZE)
+                rect = (tile_x * 2, tile_y * 2, SPRITE_SIZE, SPRITE_SIZE) # tiles x&y * 2 ==> TILE_SIZE * 2 = SPRITE_SIZE
                 line.append(image.subsurface(rect))
     
 # Fonction de récup. de tile, tout est dans le nom
     def get_sprite(self, x_char=1, y_char=10):
-        return self.sprite_table[x_char][y_char]
+        return self.sprite_table[x_char-1][y_char-1]
 
 # Dessiner le character sur l'écran (.blit)
     def draw_sprite(self):
-        self.player_sprite = self.get_sprite(0, self.facing_sprite)
-        game_screen.blit(self.player_sprite, (self.x * SPRITE_SIZE, self.y * SPRITE_SIZE))
+        self.player_sprite = self.get_sprite(1, self.facing_sprite)
 
 
 # FONCTION UPDATE / récurrence
     def update(self):
-        self.load_sprites((PLAYER_CHARACTER + '.png'), 832, 1344)
         self.movements()
         self.animation()
         

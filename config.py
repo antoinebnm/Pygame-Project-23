@@ -13,9 +13,7 @@ LOWER_MARGIN = 160
 
 TILE_SIZE = 32
 TILE_MARGIN = 0
-
 SPRITE_SIZE = 64
-PLAYER_CHARACTER = 'knight'
 
 FPS = 60
 
@@ -33,11 +31,19 @@ GROUND_LAYER = 0
 
 ###################################################################
 #                                                                 #
-#                       Movements and Keys                        #
+#                    Movements and Charcaters                     #
 #                                                                 #
 ###################################################################
 PLAYER_SPEED = 4
 
+PLAYER_CHARACTER = 'knight'
+
+
+###################################################################
+#                                                                 #
+#                             KEYBINDS                            #
+#                                                                 #
+###################################################################
 PLAYER_LEFT_KEY = pygame.K_LEFT
 PLAYER_RIGHT_KEY = pygame.K_RIGHT
 PLAYER_UP_KEY = pygame.K_UP
