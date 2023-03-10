@@ -7,9 +7,13 @@ import os
 #                        Window Settings                          #
 #                                                                 #
 ###################################################################
-SCREEN_WIDTH = 1280
-SCREEN_HEIGHT = 640
-LOWER_MARGIN = 160
+SCREEN_WIDTH = 640
+SCREEN_HEIGHT = 480
+LOWER_MARGIN = 0
+
+#SCREEN_WIDTH = 1280
+#SCREEN_HEIGHT = 640
+#LOWER_MARGIN = 160
 
 TILE_SIZE = 32
 TILE_MARGIN = 0
@@ -34,7 +38,7 @@ GROUND_LAYER = 0
 #                    Movements and Charcaters                     #
 #                                                                 #
 ###################################################################
-PLAYER_SPEED = 2
+PLAYER_SPEED = 3
 PLAYER_RUN = 5
 
 PLAYER_CHARACTER = 'knight'

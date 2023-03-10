@@ -24,3 +24,17 @@ class Levels:
             if ((file.startswith(LevelNameStart)) and (file.endswith(LevelNameEnd))):
                 self.layers.append(file)
         return self.layers
+    
+    def load_order(self):
+        load_order = []
+        map_layers = self.layer_founder(self.map)
+        for map_layer in map_layers:
+            if map_layer == (self.map + '_Ground.csv'):
+                load_order.insert(0, map_layer)
+            if map_layer == (self.map + '_Walls.csv'):
+                load_order.insert(1, map_layer)
+            if map_layer == (self.map + '_Objects.csv'):
+                load_order.insert(1, map_layer)
+            if map_layer == (self.map + '_Trees.csv'):
+                load_order.insert(1, map_layer)
+        return load_order

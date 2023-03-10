@@ -107,7 +107,7 @@ class Player():
                 self.sprite_frame = 1
         if self.sprite_animation == 'stand':
             if (self.sprite_frame < 3):
-                if ((COUNTER % 30)==0):
+                if ((COUNTER % 90)==0):
                     self.sprite_frame += 1
             else:
                 self.sprite_frame = 1
