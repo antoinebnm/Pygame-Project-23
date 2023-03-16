@@ -1,4 +1,3 @@
-import pygame, random, csv, os
 from config import *
 
 # Chargement du chemin d'accès absolu en variable globale

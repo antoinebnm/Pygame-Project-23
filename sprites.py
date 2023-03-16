@@ -6,7 +6,7 @@ path = os.path.dirname(__file__) + "/sprites/"
 screen = pygame.rect.Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
 game_screen = pygame.surface.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
 
-class Player():
+class Sprite():
     def __init__(self, x, y):
         self._layer = PLAYER_LAYER
         self.sprite_animation = 'stand'
@@ -28,6 +28,7 @@ class Player():
 
 # à changer / automatiser avec interface
         self.load_player_sprite()
+        self.draw_sprite()
 
 # Chargement tileset du chararcter / à automatiser avec interface
     def load_player_sprite(self, sprite_name=PLAYER_CHARACTER):
@@ -51,7 +52,7 @@ class Player():
 # Dessiner le character sur l'écran (.blit)
     def draw_sprite(self):
         self.player_sprite = self.get_sprite(self.sprite_frame, self.facing_sprite)
-
+        self.player_collider = pygame.rect.Rect(self.player_sprite.get_rect(topleft=(self.x + 16, self.y + 48), width=32, height=16))
 
 # FONCTION UPDATE / récurrence
     def update(self, COUNTER):
@@ -127,3 +128,7 @@ class Player():
         if keys[PLAYER_DOWN_KEY]:
             self.y_move += PLAYER_SPEED
             self.player_facing = "down"
+        
+    def correct_xy(self, dx, dy):
+        self.x_move += dx
+        self.y_move += dy

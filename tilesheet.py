@@ -1,4 +1,3 @@
-import sys, os, pygame
 from config import *
 
 # Chargement du chemin d'accès absolu en variable globale
@@ -14,9 +13,11 @@ class Tilesheet:
             line = []
             self.tile_table.append(line)
             for tile_y in range(0, rows):
-                rect = (tile_x * TILE_SIZE, tile_y * TILE_SIZE, TILE_SIZE, TILE_SIZE)
+                rect = pygame.rect.Rect(tile_x * TILE_SIZE, tile_y * TILE_SIZE, TILE_SIZE, TILE_SIZE)
                 line.append(image.subsurface(rect))
-    
+        
+        self.tile_collider = pygame.rect.Rect((0, 0), (TILE_SIZE, TILE_SIZE))
+
 # Fonction de récup. de tile, tout est dans le nom
     def get_tile(self, x, y):
         return self.tile_table[x][y]

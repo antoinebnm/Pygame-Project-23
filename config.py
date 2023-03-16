@@ -1,5 +1,4 @@
-import pygame
-import os
+import pygame, random, sys, math, random, time, csv, os
 
 
 ###################################################################
@@ -8,7 +7,7 @@ import os
 #                                                                 #
 ###################################################################
 SCREEN_WIDTH = 640
-SCREEN_HEIGHT = 480
+SCREEN_HEIGHT = 380
 LOWER_MARGIN = 0
 
 #SCREEN_WIDTH = 1280
