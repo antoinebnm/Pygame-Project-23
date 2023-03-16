@@ -42,11 +42,13 @@ class Game:
 
         # Load ALL Sprite at the very end ==> else : will not appear on screen
         self.window.blit(self.player.player_sprite, (self.player.x, self.player.y))
-        self.window.fill(pygame.color.Color(255,0,0), self.player.player_collider)
+        if DEBUG:
+            self.window.fill(pygame.color.Color(255,0,0), self.player.player_collider)
         # ___________________________________
 
     def draw_map(self):
 # Draw tilemap on screen
+        tile_colliders = []
         for i in self.load_order:
             with open(path + '/levels/' + self.level.map + '/' + i) as level_csv:
                 level_csv = csv.reader(level_csv)
@@ -60,7 +62,11 @@ class Game:
                         if i == 'inn_Walls.csv':
                             if id == '276' or id == '277' or id == '308' or id == '309':
                                 self.tiles.tile_collider.topleft = y * TILE_SIZE, x * TILE_SIZE
-                                self.window.fill(pygame.color.Color(0,0,255), self.tiles.tile_collider)
+                                tile_colliders.append(pygame.rect.Rect((self.tiles.tile_collider.topleft),(32,32)))
+                                if DEBUG:
+                                    self.window.fill(pygame.color.Color(0,0,255), self.tiles.tile_collider)
+        self.map_colliders = tile_colliders
+
 
 # Random function ==> pour le fun (epilepsie)
         if self.keys[pygame.K_r]:
@@ -76,28 +82,32 @@ class Game:
         
         if not self.menu:
             if self.keys[pygame.K_ESCAPE]:
+                image = pygame.image.load((path + '/img/' + 'mc_pausescreen' + '.png')).convert()
+                image = pygame.transform.scale(image, (SCREEN_WIDTH, SCREEN_HEIGHT))
                 self.menu = True
-                self.window.fill(pygame.color.Color(255,255,255))
+                self.window.fill(pygame.color.Color(0,0,0))
+                self.window.blit(image, screen)
         if self.menu:
             if self.keys[pygame.K_SPACE]:
                 self.menu = False
     
     def ifcollision(self):
-        dx = 0
-        dy = 0
+        dx = dy = 0
         player_collider = self.player.player_collider
-        tile_collider = self.tiles.tile_collider
-        if player_collider.colliderect(tile_collider):
-            if player_collider.top >= tile_collider.bottom:
-                dy = tile_collider.bottom - player_collider.top
-            if player_collider.left <= tile_collider.right:
-                dx = tile_collider.right - player_collider.left
-            if player_collider.right >= tile_collider.left:
-                dx = tile_collider.left - player_collider.right
-            if player_collider.bottom <= tile_collider.top:
-                dy = tile_collider.top - player_collider.bottom
-            print(dx, dy)
-    # Correct Player position ==> can move freely again
+        for tile_collider in self.map_colliders:
+            if player_collider.colliderect(tile_collider):
+                if player_collider.top >= tile_collider.bottom:
+                    dy = tile_collider.bottom - player_collider.top
+                if player_collider.left <= tile_collider.right:
+                    dx = tile_collider.right - player_collider.left
+                if player_collider.right >= tile_collider.left:
+                    dx = tile_collider.left - player_collider.right
+                if player_collider.bottom <= tile_collider.top:
+                    dy = tile_collider.top - player_collider.bottom
+                if DEBUG:
+                    print(self.map_colliders,"\n")
+                    print("Facing : ",self.player.player_facing," | dx et dy : ",dx, dy,"\n")
+    # Correct Player position ==> apply collider then player can move freely again
         self.player.correct_xy(dx, dy)
 
 
@@ -105,7 +115,8 @@ class Game:
     def update(self):
         self.ifcollision()
         self.player.update(self.COUNTER)
-        pygame.display.set_caption("Facing %s" % (self.player.player_facing))
+        if DEBUG:
+            pygame.display.set_caption("Facing %s" % (self.player.player_facing))
         #pygame.display.set_caption("{:.2f} FPS".format(self.clock.get_fps()))
 
     # Main game loop
