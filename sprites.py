@@ -1,10 +1,8 @@
 import pygame, random, math, sys
-from config import *
 
-# Chargement du chemin d'accès absolu en variable globale
-path = os.path.dirname(__file__) + "/sprites/"
-screen = pygame.rect.Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
-game_screen = pygame.surface.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+from levels import *
+from tilesheet import *
+from config import *
 
 class Sprite():
     def __init__(self, x, y):
@@ -16,6 +14,9 @@ class Sprite():
         self.y= y * TILE_SIZE
         self.w = TILE_SIZE
         self.h = TILE_SIZE
+
+    #   Need to call Tilesheet here 'cause of the colliders check
+        self.tiles = Tilesheet('tilemap.png', 63, 32)
 
 # Var de position x, y du joueur
         self.player_pos = (self.x, self.y)
@@ -32,11 +33,11 @@ class Sprite():
 
 # Chargement tileset du chararcter / à automatiser avec interface
     def load_player_sprite(self, sprite_name=PLAYER_CHARACTER):
-        self.player_sprites = self.load_sprites((sprite_name + '_' + str(self.num_tileset) + '.png'), 832, 1344)
+        self.player_sprites = self.load_sprites((sprite_name + '_' + str(self.num_tileset) + '.png'))
 
 # Suite du chargement et mise en variable
-    def load_sprites(self, filename, width, height, rows = 21, cols = 13):
-        image = pygame.image.load((path + filename)).convert() # Save des perfs, add .convert()
+    def load_sprites(self, filename, rows = 21, cols = 13):
+        image = pygame.image.load((sprite_path + filename)).convert() # Save des perfs, add .convert()
         self.sprite_table = []
         for tile_x in range(0, cols):
             line = []
@@ -62,6 +63,8 @@ class Sprite():
 # pos_move calculé par .movements()
         self.x += self.x_move
         self.y += self.y_move
+        self.is_collision('x')
+        self.is_collision('y')
 
 # redraw du sprite après check de l'animation
         self.draw_sprite()
@@ -115,7 +118,7 @@ class Sprite():
 
     def movements(self):
         keys = pygame.key.get_pressed()
-
+        
         if keys[PLAYER_LEFT_KEY]:
             self.x_move -= PLAYER_SPEED
             self.player_facing = "left"
@@ -129,6 +132,19 @@ class Sprite():
             self.y_move += PLAYER_SPEED
             self.player_facing = "down"
         
-    def correct_xy(self, dx, dy):
-        self.x_move += dx
-        self.y_move += dy
+    def is_collision(self, direction):
+        for tile_collider in self.tiles.map_colliders:
+            hits = self.player_collider.colliderect(tile_collider)
+            if hits:
+                if direction=='x':
+                    if self.x_move > 0:
+                        self.x = tile_collider.left - (self.player_collider.w + self.player_collider.h) -1
+                    if self.x_move < 0:
+                        self.x = tile_collider.right - (self.player_collider.h) +1
+
+                if direction=='y':
+                    if self.y_move > 0:
+                        self.y = tile_collider.top - (self.player_collider.w * 2) -1
+                    if self.y_move < 0:
+                        self.y = tile_collider.bottom - (self.player_collider.w + self.player_collider.h) +1
+            print(hits, self.x, self.y)

@@ -1,8 +1,5 @@
 from config import *
 
-# Chargement du chemin d'accès absolu en variable globale
-path = os.path.dirname(__file__) + "/levels/"
-
 class Levels:
     def __init__(self, map_level, screen=(pygame.rect.Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT))):
         self.screen = screen
@@ -10,7 +7,7 @@ class Levels:
 
     def maps_founder(self):
         self.maps = []
-        for dir in os.listdir(path):
+        for dir in os.listdir(level_path):
             self.maps.append(dir)
         return self.maps
 
@@ -19,7 +16,7 @@ class Levels:
         self.LevelNameEnd = LevelNameEnd
 
         self.layers = []
-        for file in os.listdir(path + self.map):
+        for file in os.listdir(level_path + self.map):
             if ((file.startswith(LevelNameStart)) and (file.endswith(LevelNameEnd))):
                 self.layers.append(file)
         return self.layers

@@ -3,74 +3,35 @@ from levels import *
 from sprites import *
 from config import *
 
-# Chargement du chemin d'accès absolu en variable globale
-path = os.path.dirname(__file__)
-
 class Game:
     def __init__(self):
         # Initialize Pygame and game objects
         pygame.init()
-        self.window = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT + LOWER_MARGIN))
-        self.screen = pygame.rect.Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
-        self.window.fill(pygame.Color(180, 120, 60))
+        
+        window.fill(pygame.Color(180, 120, 60))
         self.clock = pygame.time.Clock()
         self.menu = False
         self.running = True
         self.COUNTER = 0
 
-        self.tiles = Tilesheet('tilemap.png', 1024, 2016, 63, 32)
-
-    # Define game functions
-    def random_tiles(self):
-        for i in range(self.screen.left, self.screen.right, TILE_SIZE):
-            for j in range(self.screen.top, self.screen.bottom, TILE_SIZE):
-                self.window.blit(self.tiles.get_tile(random.randint(0,31), random.randint(0,62)), (i, j))
-
 ### Fonction initialisation d'une nouvelle partie
     def new_game(self):
-        self.window.fill(pygame.Color(0,0,0), self.screen)
+        window.fill(pygame.Color(0,0,0), screen)
         self.playing = True
-        self.player = Sprite(1,1)
 
-        self.level = Levels('inn')
-        self.load_order = self.level.load_order()
+    #   Call Player class in Sprites
+        self.player = Sprite(1,1)
 
 
 ### Fonction récurente pour actualiser l'écran
     def draw_window(self):
-        self.draw_map()
+        self.player.tiles.draw_map()
 
         # Load ALL Sprite at the very end ==> else : will not appear on screen
-        self.window.blit(self.player.player_sprite, (self.player.x, self.player.y))
+        window.blit(self.player.player_sprite, (self.player.x, self.player.y))
         if DEBUG:
-            self.window.fill(pygame.color.Color(255,0,0), self.player.player_collider)
+            window.fill(pygame.color.Color(255,0,0), self.player.player_collider)
         # ___________________________________
-
-    def draw_map(self):
-# Draw tilemap on screen
-        tile_colliders = []
-        for i in self.load_order:
-            with open(path + '/levels/' + self.level.map + '/' + i) as level_csv:
-                level_csv = csv.reader(level_csv)
-                for x, rows in enumerate(level_csv):
-                    for y, id in enumerate(rows):
-                        if id == '-1':
-                            pass
-                        else :
-                            self.window.blit(self.tiles.get_tile(int(id) % TILE_SIZE, int(id) // TILE_SIZE), (y * TILE_SIZE, x * TILE_SIZE))
-                        #print('x : ', x, ' y : ', y, ' row : ', rows, ' id : ', id)
-                        if i == 'inn_Walls.csv':
-                            if id == '276' or id == '277' or id == '308' or id == '309':
-                                self.tiles.tile_collider.topleft = y * TILE_SIZE, x * TILE_SIZE
-                                tile_colliders.append(pygame.rect.Rect((self.tiles.tile_collider.topleft),(32,32)))
-                                if DEBUG:
-                                    self.window.fill(pygame.color.Color(0,0,255), self.tiles.tile_collider)
-        self.map_colliders = tile_colliders
-
-
-# Random function ==> pour le fun (epilepsie)
-        if self.keys[pygame.K_r]:
-            self.random_tiles()
 
     # Handle user input events
     def events(self):
@@ -82,38 +43,17 @@ class Game:
         
         if not self.menu:
             if self.keys[pygame.K_ESCAPE]:
-                image = pygame.image.load((path + '/img/' + 'mc_pausescreen' + '.png')).convert()
+                image = pygame.image.load((img_path + 'mc_pausescreen' + '.png')).convert()
                 image = pygame.transform.scale(image, (SCREEN_WIDTH, SCREEN_HEIGHT))
                 self.menu = True
-                self.window.fill(pygame.color.Color(0,0,0))
-                self.window.blit(image, screen)
+                window.fill(pygame.color.Color(0,0,0))
+                window.blit(image, screen)
         if self.menu:
             if self.keys[pygame.K_SPACE]:
                 self.menu = False
-    
-    def ifcollision(self):
-        dx = dy = 0
-        player_collider = self.player.player_collider
-        for tile_collider in self.map_colliders:
-            if player_collider.colliderect(tile_collider):
-                if player_collider.top >= tile_collider.bottom:
-                    dy = tile_collider.bottom - player_collider.top
-                if player_collider.left <= tile_collider.right:
-                    dx = tile_collider.right - player_collider.left
-                if player_collider.right >= tile_collider.left:
-                    dx = tile_collider.left - player_collider.right
-                if player_collider.bottom <= tile_collider.top:
-                    dy = tile_collider.top - player_collider.bottom
-                if DEBUG:
-                    print(self.map_colliders,"\n")
-                    print("Facing : ",self.player.player_facing," | dx et dy : ",dx, dy,"\n")
-    # Correct Player position ==> apply collider then player can move freely again
-        self.player.correct_xy(dx, dy)
-
 
     # Update the game state based on user input and object behavior
     def update(self):
-        self.ifcollision()
         self.player.update(self.COUNTER)
         if DEBUG:
             pygame.display.set_caption("Facing %s" % (self.player.player_facing))

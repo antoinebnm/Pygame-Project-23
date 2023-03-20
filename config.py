@@ -1,5 +1,9 @@
 import pygame, random, sys, math, random, time, csv, os
 
+PATH = os.path.dirname(__file__)
+img_path = PATH + "/img/"
+sprite_path = PATH + "/sprites/"
+level_path = PATH + "/levels/"
 
 ###################################################################
 #                                                                 #
@@ -52,3 +56,7 @@ PLAYER_LEFT_KEY = pygame.K_LEFT
 PLAYER_RIGHT_KEY = pygame.K_RIGHT
 PLAYER_UP_KEY = pygame.K_UP
 PLAYER_DOWN_KEY = pygame.K_DOWN
+
+
+window = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT + LOWER_MARGIN))
+screen = pygame.rect.Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
