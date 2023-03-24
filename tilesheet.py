@@ -44,7 +44,7 @@ class Tilesheet:
                         if i == 'inn_Walls.csv':
                             if id == '276' or id == '277' or id == '308' or id == '309':
                                 self.tile_collider.topleft = y * TILE_SIZE, x * TILE_SIZE
-                                tile_colliders.append(pygame.rect.Rect((self.tile_collider.topleft),(32,32)))
+                                tile_colliders.append(pygame.rect.Rect(self.tile_collider.left,self.tile_collider.top,32,32))
                                 if DEBUG:
                                     window.fill(pygame.color.Color(0,0,255), self.tile_collider)
         self.map_colliders = tile_colliders

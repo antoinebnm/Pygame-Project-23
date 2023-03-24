@@ -27,6 +27,8 @@ class Sprite():
         self.sprite_frame = 1
         self.facing_sprite = 10
 
+        self.obstacles = [False,False,False,False]
+
 # à changer / automatiser avec interface
         self.load_player_sprite()
         self.draw_sprite()
@@ -63,8 +65,7 @@ class Sprite():
 # pos_move calculé par .movements()
         self.x += self.x_move
         self.y += self.y_move
-        self.is_collision('x')
-        self.is_collision('y')
+        self.is_collision()
 
 # redraw du sprite après check de l'animation
         self.draw_sprite()
@@ -119,32 +120,34 @@ class Sprite():
     def movements(self):
         keys = pygame.key.get_pressed()
         
-        if keys[PLAYER_LEFT_KEY]:
+        if keys[PLAYER_LEFT_KEY]:# and not obstacles[0]:
             self.x_move -= PLAYER_SPEED
             self.player_facing = "left"
-        if keys[PLAYER_RIGHT_KEY]:
+        if keys[PLAYER_RIGHT_KEY]:# and not obstacles[2]:
             self.x_move += PLAYER_SPEED
             self.player_facing = "right"
-        if keys[PLAYER_UP_KEY]:
+        if keys[PLAYER_UP_KEY]:# and not obstacles[1]:
             self.y_move -= PLAYER_SPEED
             self.player_facing = "up"
-        if keys[PLAYER_DOWN_KEY]:
+        if keys[PLAYER_DOWN_KEY]:# and not obstacles[3]:
             self.y_move += PLAYER_SPEED
             self.player_facing = "down"
         
-    def is_collision(self, direction):
+    def is_collision(self):
+        #obstacles = [False,False,False,False]
         for tile_collider in self.tiles.map_colliders:
             hits = self.player_collider.colliderect(tile_collider)
             if hits:
-                if direction=='x':
-                    if self.x_move > 0:
-                        self.x = tile_collider.left - (self.player_collider.w + self.player_collider.h) -1
-                    if self.x_move < 0:
-                        self.x = tile_collider.right - (self.player_collider.h) +1
+                if self.player_facing=='right' and self.x_move>0:
+                    self.x = tile_collider.left - (self.player_collider.w + self.player_collider.h) -1
+                    #obstacles[2] = True
+                if self.player_facing=='left' and self.x_move<0:
+                    self.x = tile_collider.right - (self.player_collider.h) +1
+                    #obstacles[0] = True
 
-                if direction=='y':
-                    if self.y_move > 0:
-                        self.y = tile_collider.top - (self.player_collider.w * 2) -1
-                    if self.y_move < 0:
-                        self.y = tile_collider.bottom - (self.player_collider.w + self.player_collider.h) +1
-            print(hits, self.x, self.y)
+                if self.player_facing=='down' and self.y_move>0:
+                    self.y = tile_collider.top - (self.player_collider.w * 2) -1
+                    #obstacles[3] = True
+                if self.player_facing=='up' and self.y_move<0:
+                    self.y = tile_collider.bottom - (self.player_collider.w + self.player_collider.h) +1
+                    #obstacles[1] = True

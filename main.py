@@ -35,6 +35,8 @@ class Game:
 
     # Handle user input events
     def events(self):
+        keys = pygame.key.get_pressed()
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.playing = False
