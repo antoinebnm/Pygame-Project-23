@@ -1,8 +1,7 @@
 from config import *
 
 class Levels:
-    def __init__(self, map_level, screen=(pygame.rect.Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT))):
-        self.screen = screen
+    def __init__(self, map_level):
         self.map = map_level
 
     def maps_founder(self):
@@ -11,26 +10,22 @@ class Levels:
             self.maps.append(dir)
         return self.maps
 
-    def layer_founder(self, LevelNameStart, LevelNameEnd=('.csv')):
-        self.LevelNameStart = LevelNameStart
-        self.LevelNameEnd = LevelNameEnd
-
+    def layer_founder(self):
         self.layers = []
-        for file in os.listdir(level_path + self.map):
-            if ((file.startswith(LevelNameStart)) and (file.endswith(LevelNameEnd))):
-                self.layers.append(file)
+        for file in os.listdir(level_path + self.map + '/layers/'):
+            self.layers.append(file)
         return self.layers
-    
+        
     def load_order(self):
         load_order = []
         map_layers = self.layer_founder(self.map)
         for map_layer in map_layers:
-            if map_layer == (self.map + '_Ground.csv'):
-                load_order.insert(0, map_layer)
-            if map_layer == (self.map + '_Walls.csv'):
-                load_order.insert(1, map_layer)
-            if map_layer == (self.map + '_Objects.csv'):
-                load_order.insert(1, map_layer)
-            if map_layer == (self.map + '_Trees.csv'):
-                load_order.insert(1, map_layer)
+            for i in range(len(map_layers)):
+                if i <10:
+                    if map_layer.startwith('Layer_000' + i):
+                        layer = map_layer
+                elif i>9 and i<100:
+                    if map_layer.startwith('Layer_00' + i):
+                        layer = map_layer                  
+                load_order.append(layer)
         return load_order
