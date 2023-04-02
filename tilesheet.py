@@ -7,24 +7,31 @@ class Map:
         self.background = []
         self.level = Levels('Forest')
         image = pygame.image.load((level_path + self.level.map + '/Preview/Background.png')).convert()
-        self.image = pygame.transform.smoothscale(image, window.get_size())
-        """for layer in (self.level.layer_founder()):
-            image = pygame.image.load((level_path + self.level.map + '/layers/' + layer)).convert()
-            self.background.append(image)"""
-        self.ground = (SCREEN_HEIGHT // (1.36))
+        self.image = pygame.transform.smoothscale(image, screen.size)
+        self.ground = SCREEN_HEIGHT - (LOWER_MARGIN + 6)
+        self.memory = window.get_size()
+        self.scroll = 0
+        self.offset = math.ceil(SCREEN_WIDTH / self.image.get_width()) + 1
+        window.blit(self.image, screen)
+    
+    def update(self,COUNTER):
+        if self.memory != window.get_size():
+            self.image = pygame.transform.scale(self.image, screen.size)
+            self.ground = SCREEN_HEIGHT - (LOWER_MARGIN + 6)
+            self.memory = window.get_size()
 
 
-    def draw_map(self):
-# Draw map's layers on screen
-        window.fill(pygame.color.Color(0,0,0))
-        width = self.image.get_width()
-        window.blit(self.image, (0,0))
+    def scroll_map(self, x):
+        window.fill(pygame.color.Color(20,23,36))
 
-"""
-        width = sky_img.get_width()
-	    for x in range(5):
-		    screen.blit(sky_img, ((x * width) - bg_scroll * 0.5, 0))
-		    screen.blit(mountain_img, ((x * width) - bg_scroll * 0.6, SCREEN_HEIGHT - mountain_img.get_height() - 300))
-		    screen.blit(pine1_img, ((x * width) - bg_scroll * 0.7, SCREEN_HEIGHT - pine1_img.get_height() - 150))
-		    screen.blit(pine2_img, ((x * width) - bg_scroll * 0.8, SCREEN_HEIGHT - pine2_img.get_height()))
-"""
+        i=0
+        while(i < self.offset):
+            window.blit(self.image, (self.image.get_width() * i + self.scroll, 0))
+            i += 1
+        # FRAME FOR SCROLLING
+        self.scroll -= x * PLAYER_RUN
+        # RESET THE SCROLL FRAME
+        if abs(self.scroll) > self.image.get_width():
+            self.scroll = 0
+
+        pygame.display.update(screen)

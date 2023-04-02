@@ -20,11 +20,16 @@ class Sprite():
         self.tiles = Map()
 
 # Var de position x, y du joueur
-        self.x = SCREEN_WIDTH // 300
-        self.y = 0
         self.player_facing = "right"
         self.sprite_frame = 1
         self.facing_sprite = 10
+
+        if self.view == 2:
+            self.x = SCREEN_WIDTH // 400
+            self.y = self.tiles.ground
+        elif self.view == 2.5:
+            self.x = SCREEN_WIDTH // 30
+            self.y = SCREEN_HEIGHT // 2
 
         self.load_player_sprite()
         self.player_collider = pygame.rect.Rect(self.player_sprite.get_rect(topleft=(self.x + 16, self.y + 48), width=24, height=16))
@@ -58,14 +63,8 @@ class Sprite():
 
 # FONCTION UPDATE / récurrence
     def update(self, COUNTER):
-        #self.movements()
-        #self.animation(COUNTER)
-        if self.view == 2:
-            self.x = SCREEN_WIDTH // 300
-            self.y = self.tiles.ground
-        elif self.view == 2.5:
-            self.x = SCREEN_WIDTH // 30
-            self.y = SCREEN_HEIGHT // 2
+        self.movements()
+        self.animation(COUNTER)
 
 # redraw du sprite après check de l'animation
         self.draw_sprite(self.x,self.y)
@@ -95,3 +94,8 @@ class Sprite():
                 self.sprite_frame = 1
         if self.sprite_animation == 'stand':
             self.sprite_frame = 1
+
+    def movements(self):
+        keys = pygame.key.get_pressed()
+        if keys[PLAYER_RIGHT_KEY]:
+            self.tiles.scroll_map(1)
