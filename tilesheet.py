@@ -4,6 +4,7 @@ from levels import *
 class Map:
 # Chargement de la map à automatiser avec interface
     def __init__(self):
+        window.fill(pygame.color.Color(20,23,36))
         self.background = []
         self.level = Levels('Forest')
         image = pygame.image.load((level_path + self.level.map + '/Preview/Background.png')).convert()
@@ -22,8 +23,6 @@ class Map:
 
 
     def scroll_map(self, x):
-        window.fill(pygame.color.Color(20,23,36))
-
         i=0
         while(i < self.offset):
             window.blit(self.image, (self.image.get_width() * i + self.scroll, 0))

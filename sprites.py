@@ -8,7 +8,7 @@ class Sprite():
     def __init__(self, view, scale):
         self._layer = PLAYER_LAYER
         self.sprite_animation = 'stand'
-        self.num_tileset = 0
+        self.num_tileset = [0,0,0,0]
         self.view = view
 
         self.w = TILE_SIZE
@@ -22,7 +22,7 @@ class Sprite():
 # Var de position x, y du joueur
         self.player_facing = "right"
         self.sprite_frame = 1
-        self.facing_sprite = 10
+        self.facing_sprite = 12
 
         if self.view == 2:
             self.x = SCREEN_WIDTH // 400
@@ -31,17 +31,25 @@ class Sprite():
             self.x = SCREEN_WIDTH // 30
             self.y = SCREEN_HEIGHT // 2
 
-        self.load_player_sprite()
-        self.player_collider = pygame.rect.Rect(self.player_sprite.get_rect(topleft=(self.x + 16, self.y + 48), width=24, height=16))
+        self.assign_sprite_tileset()
+        #self.player_collider = pygame.rect.Rect(self.team_sprites.get_rect(topleft=(self.x + 16, self.y + 48), width=24, height=16))
 
 
 # Chargement tileset du chararcter / à automatiser avec interface
-    def load_player_sprite(self, sprite_name=PLAYER_CHARACTER):
-        self.player_sprites = self.load_sprites((sprite_name + '_' + str(self.num_tileset) + '.png'))
-        self.player_sprite = self.get_sprite(self.sprite_frame, self.facing_sprite)
+    def assign_sprite_tileset(self):
+    # PLAYERCHAR = warrior, archer, mage, healer
+        self.team_sprites = []
+        self.sprites_tilesets = []
+        for character in PLAYER_CHARACTERS:
+            i = self.num_tileset[PLAYER_CHARACTERS.index(character)]
+        # sprites_tilesets = all sprites tilesets | team_sprites = all sprites frames
+            self.sprites_tilesets.append(self.load_tileset((character + '_' + str(self.num_tileset[i]) + '.png')))
+            self.team_sprites.append(self.get_sprite(character, self.sprite_frame, self.facing_sprite))
+            """ Add indexes to scale player """
+            self.team_sprites[i] = pygame.transform.scale(self.team_sprites[i], (((int(self.team_sprites[i].get_width())*self.scale)),(int(self.team_sprites[i].get_height())*self.scale)))
 
 # Suite du chargement et mise en variable
-    def load_sprites(self, filename, rows = 21, cols = 13):
+    def load_tileset(self, filename, rows = 21, cols = 13):
         image = pygame.image.load((sprite_path + filename)).convert() # Save des perfs, add .convert()
         self.sprite_table = []
         for tile_x in range(0, cols):
@@ -50,22 +58,25 @@ class Sprite():
             for tile_y in range(0, rows):
                 rect = (tile_x * SPRITE_SIZE, tile_y * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE) # tiles x&y * 2 ==> TILE_SIZE * 2 = SPRITE_SIZE
                 line.append(image.subsurface(rect))
+        return self.sprite_table
     
 # Fonction de récup. de tile, tout est dans le nom
-    def get_sprite(self, x_char=1, y_char=10):
-        return self.sprite_table[x_char - 1][y_char - 1]
+    def get_sprite(self, table_name, x_char=1, y_char=12):
+        i = PLAYER_CHARACTERS.index(table_name)
+        return self.sprites_tilesets[i][x_char - 1][y_char - 1]
 
 # Dessiner le character sur l'écran (.blit)
     def draw_sprite(self,x,y):
-        self.player_sprite = self.get_sprite(self.sprite_frame, self.facing_sprite)
-        self.player_sprite = pygame.transform.scale(self.player_sprite, (((int(self.player_sprite.get_width())*self.scale)),(int(self.player_sprite.get_height())*self.scale)))
-        self.player_collider = self.player_sprite.get_rect(topleft=(x + 16, y + 48), width=24, height=16)
+        memory = []
+        for character in PLAYER_CHARACTERS:
+            memory.append(self.get_sprite(character, self.sprite_frame, self.facing_sprite))
+       
+        #self.player_collider = self.team_sprites.get_rect(topleft=(x + 16, y + 48), width=24, height=16)
 
 # FONCTION UPDATE / récurrence
     def update(self, COUNTER):
         self.movements()
         self.animation(COUNTER)
-
 # redraw du sprite après check de l'animation
         self.draw_sprite(self.x,self.y)
 

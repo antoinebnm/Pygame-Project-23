@@ -28,3 +28,6 @@ class Button():
 			self.clicked = False
 
 		return action
+	
+	def menu_check(self):
+		pass

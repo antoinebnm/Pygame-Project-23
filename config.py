@@ -14,7 +14,7 @@ pygame.display.init()
 ###################################################################
 # 1600x900 | 1440×900 | 1280×720 
 SCREEN_WIDTH, SCREEN_HEIGHT = pygame.display.get_desktop_sizes()[0][0]-320,pygame.display.get_desktop_sizes()[0][1]-280
-LOWER_MARGIN = 100
+LOWER_MARGIN = 180
 
 TILE_SIZE = 32
 TILE_MARGIN = 0
@@ -23,6 +23,8 @@ SPRITE_SIZE = 64
 FPS = 60
 
 DEBUG = False
+
+COLOR_UI = pygame.color.Color(20, 23, 37)
 
 
 ###################################################################
@@ -43,7 +45,7 @@ PLAYER_SPEED = SCREEN_WIDTH / 500
 PLAYER_RUN = SCREEN_WIDTH / 320
 UI_SCALE = (SCREEN_WIDTH*SCREEN_HEIGHT) // 810000
 
-PLAYER_CHARACTER = 'warrior'
+PLAYER_CHARACTERS = ['warrior','elve','mage'] # warrior, elve, mage, healer
 
 
 ###################################################################
