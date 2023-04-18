@@ -1,7 +1,5 @@
-from tilesheet import *
-from levels import *
 from sprites import *
-from config import *
+from fight import *
 from button import *
 
 #button images
@@ -14,6 +12,8 @@ newg_button = Button(SCREEN_WIDTH // 2, (SCREEN_HEIGHT // 2), newg_img, 0.6)
 load_button = Button(SCREEN_WIDTH // 2, (SCREEN_HEIGHT // 2) + ind*0.5, load_img, 0.6)
 option_button = Button(SCREEN_WIDTH // 2, (SCREEN_HEIGHT // 2) + ind, option_img, 0.6)
 exit_button = Button(SCREEN_WIDTH // 2, (SCREEN_HEIGHT // 2) + ind*1.5, exit_img, 0.6)
+menu_img = pygame.image.load((img_path + 'mc_pausescreen' + '.png')).convert()
+
 
 class Game:
     def __init__(self):
@@ -21,6 +21,7 @@ class Game:
         pygame.init()
         
         window.fill(pygame.Color(0,0,0)) # Add load screen
+        self.text_box = pygame.rect.Rect((0,0),(screen.size))
         self.menu = False
         self.playing = False
         self.running = True
@@ -31,12 +32,15 @@ class Game:
     def new_game(self):
     # Reset datas
         """ To do """
+        self.wave_num = 0
         self.playing = True
     #Call Player class in Sprites
         self.player = Sprite(2, 1)
     # Init screen
         window.fill(COLOR_UI)
         window.blit(self.player.tiles.image,screen)
+        self.text_update()
+
 
     # Handle user input events
     def events(self):
@@ -49,22 +53,45 @@ class Game:
                 pygame.quit()
 
         if not self.menu:
+            menubg = False
             if keys[pygame.K_ESCAPE]:
-                image = pygame.image.load((img_path + 'mc_pausescreen' + '.png')).convert()
-                image = pygame.transform.scale(image, (SCREEN_WIDTH, SCREEN_HEIGHT))
+                #pygame.quit()
                 self.menu = True
-                window.blit(image, window)
+                if not menubg:
+                    menubg = True
+                    menu_bg = pygame.transform.smoothscale(menu_img, window.get_size())
+                    window.blit(menu_bg,window.get_rect())
         if self.menu:
             if keys[pygame.K_SPACE]:
                 self.menu = False
+                self.player.tiles.scroll_map(0)
+                self.update()
+ 
+    def text_update(self):
+        ui = pygame.rect.Rect(screen.left, screen.bottom, window.get_width(), LOWER_MARGIN)
+        window.fill(COLOR_UI,ui)
+    # UI indicator
+        self.text_write(100,20, 'Health points :')
+        self.text_write(100,40, 'Ammo :')
+        self.text_write(700,20, 'Current Attacker :')
+        self.text_write(700,40, 'Next Attacker :')
+    # Wave indicator
+        self.text_write(400,((-1) * SCREEN_HEIGHT + 60), ('Wave n°' + str(self.wave_num)),2.4)
+
+    def text_write(self, x, y, text='default text', scale=1):
+        scale = float(scale)
+        text = font.render(text, False, COLOR_WHITE).convert_alpha()
+        text = pygame.transform.scale_by(text,scale)
+        text_rect = text.get_rect()
+        y += SCREEN_HEIGHT # adjust to bottom of screen / ui
+        text_rect.topleft = ((x),(y))
+        window.blit(text, text_rect)
 
     # Update the game state based on user input and object behavior
     def update(self):
-        for character in PLAYER_CHARACTERS:
-            i = PLAYER_CHARACTERS.index(character)
-            window.blit(self.player.team_sprites[i], (self.player.x + (i*30), self.player.y))
         self.player.update(self.COUNTER)
         self.player.tiles.update(self.COUNTER)
+        self.text_update()
 
     # Main game loop
     def run(self):

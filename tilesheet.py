@@ -9,7 +9,7 @@ class Map:
         self.level = Levels('Forest')
         image = pygame.image.load((level_path + self.level.map + '/Preview/Background.png')).convert()
         self.image = pygame.transform.smoothscale(image, screen.size)
-        self.ground = SCREEN_HEIGHT - (LOWER_MARGIN + 6)
+        self.ground = GROUND_LEVEL
         self.memory = window.get_size()
         self.scroll = 0
         self.offset = math.ceil(SCREEN_WIDTH / self.image.get_width()) + 1
@@ -18,7 +18,7 @@ class Map:
     def update(self,COUNTER):
         if self.memory != window.get_size():
             self.image = pygame.transform.scale(self.image, screen.size)
-            self.ground = SCREEN_HEIGHT - (LOWER_MARGIN + 6)
+            self.ground = SCREEN_HEIGHT
             self.memory = window.get_size()
 
 

@@ -1,8 +1,4 @@
-import pygame, random, math, sys
-
-from levels import *
 from tilesheet import *
-from config import *
 
 class Sprite():
     def __init__(self, view, scale):
@@ -20,7 +16,7 @@ class Sprite():
         self.tiles = Map()
 
 # Var de position x, y du joueur
-        self.player_facing = "right"
+        self.player_facing = 'right'
         self.sprite_frame = 1
         self.facing_sprite = 12
 
@@ -32,7 +28,8 @@ class Sprite():
             self.y = SCREEN_HEIGHT // 2
 
         self.assign_sprite_tileset()
-        #self.player_collider = pygame.rect.Rect(self.team_sprites.get_rect(topleft=(self.x + 16, self.y + 48), width=24, height=16))
+        if DEBUG:
+            self.player_collider = pygame.rect.Rect(self.team_sprites.get_rect(topleft=(self.x + 16, self.y + 48), width=24, height=16))
 
 
 # Chargement tileset du chararcter / à automatiser avec interface
@@ -69,7 +66,9 @@ class Sprite():
     def draw_sprite(self,x,y):
         memory = []
         for character in PLAYER_CHARACTERS:
+            i = PLAYER_CHARACTERS.index(character)
             memory.append(self.get_sprite(character, self.sprite_frame, self.facing_sprite))
+            window.blit(self.team_sprites[i], (self.x + (i*30), self.y))
        
         #self.player_collider = self.team_sprites.get_rect(topleft=(x + 16, y + 48), width=24, height=16)
 
