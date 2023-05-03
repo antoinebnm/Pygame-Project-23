@@ -84,5 +84,3 @@ PLAYER_DOWN_KEY = pygame.K_DOWN
 if DEBUG:
     print('ground lvl',GROUND_LEVEL, 'lower marg.',LOWER_MARGIN)
     print('width',SCREEN_WIDTH,'height',SCREEN_HEIGHT)
-    print(pygame.font.get_default_font())
-    print(pygame.font.get_fonts())
