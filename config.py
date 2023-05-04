@@ -35,7 +35,7 @@ font = pygame.font.Font((fonts_path + '8bit_wonder/8-BITWONDER.ttf'),16)
 clock = pygame.time.Clock()
 
 
-DEBUG = True
+DEBUG = False
 
 
 ###################################################################
@@ -66,7 +66,7 @@ PLAYER_SPEED = SCREEN_WIDTH / 500
 PLAYER_RUN = SCREEN_WIDTH / 320
 UI_SCALE = (SCREEN_WIDTH*SCREEN_HEIGHT) // 810000
 
-PLAYER_CHARACTERS = ['warrior','elve','mage'] # warrior, elve, mage, healer
+PLAYER_CHARACTERS = ['warrior','elve','healer','mage'] # warrior, elve, mage, healer
 
 
 ###################################################################
