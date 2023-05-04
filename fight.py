@@ -28,24 +28,23 @@ class Chararcter():
 
 
 class Fight():
-    def __init__(self, wave):
-    # Basic variables
-        self.win_team = None
-        self.fight_ended = False
-        self.wave_ended = False
+    def __init__(self):
     # Reset or not if no saves
         if SAVE == True:
             self.load_vars()
         else:
             self.reset_vars()
-        
-        if player_group == []:
-            self.end_game()
-        else:
-            self.win_team = self.fight_syst(wave)
-            if self.fight_ended:
-            # Si combat fini, alors mettre fin au combat / à automatiser + adapter à pygame /!\
-                self.fight_end(self.win_team)
+    
+    def main(self, wave):
+    # Basic variables
+        self.win_team = None
+        self.wave_ended = False
+        self.fight_ended = False
+
+        self.win_team = self.fight_syst(wave)
+        if self.fight_ended:
+        # Si combat fini, alors mettre fin au combat / à automatiser + adapter à pygame /!\
+            self.fight_end(self.win_team)
 
     def load_vars(self):
         pass
@@ -57,8 +56,8 @@ class Fight():
         self.is_alive(wave, False)
 
         print(f"""
-        Wave n°{wave+1}
-        Turn : {turn}""")
+    Wave n°{wave+1}
+Turn : {turn}""")
         print(f"The attacker is {atk.char_name} {'ID:' + str(atk.id) if atk in monster_group[wave] else ''}               <<<<<")
     # Si l'attaquant est un héros, alors Affichage des cibles possibles
         if atk.camp == 'hero':
@@ -71,7 +70,9 @@ class Fight():
 |   3. Special attack   | Define for each hero        |
 |   4. Defend           | Increase armor for 1 turn   |
  –––––––––––––––––––––––––––––––––––––––––––––––––––––
-| 0: Print stats        | 9: Revive/Heal all heroes   |
+|   0. Print stats      | Affiche la vie de tous      |
+|   8. Instant Kill     | Tue instant un ennemi       |
+|   9. Revive/Heal      | Res + Heal all allies       |
  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
             Possibles targets :""")
             for i,monster in enumerate(monster_group[wave]):
@@ -94,19 +95,33 @@ class Fight():
             print("–––––––––––––––––––––––––––––––––––––")
 
         while not self.wave_ended:
-        # Manage des incrémentations de tours et d'indexations #
-            turn += 1                                          #
-            index += 1                                         #
-            atk_list = self.get_turn(wave)                     #
-            if index >= len(atk_list):                         #
-                index = 0                                      #
-
+        # Manage des incrémentations de tours et d'indexations
+            turn += 1
+            index += 1
+            atk_list = self.get_turn(wave) # get_turn() donne l'ordre d'attaque des personnages
+            
+        # Manage index of turn list
+            self.check = False
+            while not self.check:
+                if index >= len(atk_list):
+                    index = 0
+                    self.check = False
+                elif not atk_list[index].is_alive:
+                    index +=1
+                    self.check = False
+                elif atk_list[index].is_alive and index <= len(atk_list):
+                    self.check = True
+            
+                
+                
+            
+        # Global vars
             target = None
             action = None
             security = True
 
-# Print reccursive ui for the player / adapt to pygame /!\
-            if DEBUG: print('Index =',index)
+        # Print reccursive ui for the player / adapt to pygame /!\
+            if DEBUG: print('\nIndex =',index)
 
             self.ui(wave,turn,atk_list[index]) #+ is_alive func.
 
@@ -118,7 +133,7 @@ class Fight():
                     except ValueError:
                         print('\n>>> Invalid action, please try again.')
                     else:
-                        if action in [1,2,3]:
+                        if action in [1,2,3,8]:
                             target = input("Wanna attack which ennemy ?\n ")
                         elif action == 4:
                             print("You'll block some of the next damage you'll receive next attack (this turn only)")
@@ -151,7 +166,7 @@ class Fight():
                                 target = None
                                 print('\n>>> Target can\'t be yourself!')
                     
-                    if (action in [1,2,3,4]) and (target in range(0, len(Waves[wave]) + 1)):
+                    if (action in [1,2,3,4,8]) and (target in range(0, len(Waves[wave]) + 1)):
                         security = False
 
                     if not security:
@@ -204,6 +219,7 @@ class Fight():
                 if Pdeads == len(player_group):
                     win_team = 'monsters'
                     self.wave_ended = True
+                    self.fight_ended = True
                     break
         # ---- End of the while wave loop ----
         return win_team
@@ -222,17 +238,21 @@ class Fight():
             if DEBUG and out: print(f'check alive monster {character.char_name}{character.id}: {character.is_alive}')
 
     def fight_end(self,win_team):
-        print('Vague terminée\n-\n-')
+        print('\n-\nVague terminée\n-')
         if win_team == 'monsters':
             print('Game lost')
+            self.end_game()
         else:
             print('Victory')
         print(f'The {win_team} has won.')
         time.sleep(2)
-
-    def ai(self):                   # AI of the monsters
-        action = random.randint(1,2)            # Range of random attacks of the monster
-        target = random.choice([x for x in player_group if x.is_alive == True])        # Range of the random target of the monsters
+        
+# AI of the monsters
+    def ai(self):
+    # Range of random attacks of the monster
+        action = random.randint(2,2)
+    # Range of the random target of the monsters
+        target = random.choice([x for x in player_group if x.is_alive == True])
         return target, action
 
 # System for turn by turn gameplay
@@ -242,13 +262,9 @@ class Fight():
         speeds_list = []
 
         for member in player_group:
-            if member.is_alive:
-                speeds_list.append(member.Speed)
-            if DEBUG: print(member.char_name,member.Speed)
+            speeds_list.append(member.Speed)
         for monster in monster_group[wave]:
-            if monster.is_alive:
-                speeds_list.append(monster.Speed)
-            if DEBUG: print(monster.char_name,monster.Speed)
+            speeds_list.append(monster.Speed)
         speeds_list.sort()
         i = 0
         IDs = []
@@ -256,13 +272,13 @@ class Fight():
             j = k = 0
             j += 1
             for monster in monster_group[wave]:
-                if (monster.Speed == turn) and (j <= len(monster_group[wave])) and (monster.id not in IDs) and (monster.is_alive == True):
+                if (monster.Speed == turn) and (j <= len(monster_group[wave])) and (monster.id not in IDs):
                     i += 1
                     turns_list.insert(i,monster)
                     IDs.append(monster.id)
             k += 1
             for member in player_group:
-                if member.Speed == turn and (k <= len(player_group)) and (member.is_alive == True):
+                if member.Speed == turn and (k <= len(player_group)):
                     i += 1
                     turns_list.insert(i,member)
         if DEBUG:
@@ -293,6 +309,10 @@ class Fight():
             print(f'{attacker.char_name} will block some of the damage recieved during this turn.')
             block = attacker.Health * attacker.Armor
             print(f'{attacker.char_name}, will prevent {block} damages.')
+        elif action == 8:
+            print(f'Insta killed {target.char_name}')
+            target.Health -= target.Health
+        
         if target.Health < 0:
             target.Health = 0
         if action != 4:
@@ -310,7 +330,7 @@ class Fight():
 
 def stats(team):
     print("–––––––––––––––––––––––––––––––––––––")
-    for i,member in enumerate(team):
+    for member in team:
         print('\n',member.char_name,':')
         for j,stat in enumerate(vars(member)):
             if str(stat) in chararcter_stats:
@@ -365,8 +385,9 @@ Enemies = [Ogre, Dragon]
 stats(player_group); stats(Enemies)
 
 """"""
-for wave_number in range(len(Waves)):
-    game = Fight((wave_number))
+Game = Fight()
+for wave_number in range(1,len(Waves)):
+    Game.main(wave_number)
 
 """ list of stats
 Ogre:

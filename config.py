@@ -35,7 +35,7 @@ font = pygame.font.Font((fonts_path + '8bit_wonder/8-BITWONDER.ttf'),16)
 clock = pygame.time.Clock()
 
 
-DEBUG = False
+DEBUG = True
 
 
 ###################################################################
