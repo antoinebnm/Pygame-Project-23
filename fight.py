@@ -1,8 +1,15 @@
-from config import *
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+#from config import *
+import time, random
+
+PLAYER_CHARACTERS = ['warrior','elve','healer','mage']
+DEBUG = False
 
 SAVE = False
 
-class Chararcter():
+class Character():
     def __init__(self, id, camp, char_name, health, speed, damage, armor, ammo=None,x=0, y=0, scale=1):
         super().__init__
 
@@ -56,9 +63,11 @@ class Fight():
             self.fight_end(self.win_team)
 
     def load_vars(self):
+    # Load variables on a json file
         pass
 
     def reset_vars(self):
+    # Reset variables on a json file
         pass
 
     def ui(self,wave,turn,atk): # / adapt to pygame /!\
@@ -82,7 +91,7 @@ Turn : {turn}""")
                 print(""" –––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
 |   1. Basic Slash      | Basic Attack                                          |
 |   2. Jump Slash       | + 20%. of damages  / Armor -10%                       |
-|   3. Spin Attack      | Ignore Enemy Armor / Cooldown of 1 turn               |
+|   3. Spining Attack   | Ignore Enemy Armor / Cooldown of 1 turn               |
 |   4. Defend           | Increase armor     / Armor +30%. for one turn         |
  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯""")
             elif atk == Chasseur:
@@ -93,17 +102,17 @@ Turn : {turn}""")
 |   4. Defend           | Increase armor     / Armor +30%. for one turn         |
  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯""")
                 # working
-            elif atk == Guerrisseur:
+            elif atk == Guerisseur:
                 print(""" –––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
 |   1. Stick Swing      | Basic Attack                                          |
 |   2. Heal             | Heal an Ally   / +20%. of Ally Max Health             |
-|   3. Revive           | Revive an Ally / Backslash (40%.) + Cooldown 2 turns  |
+|   3. Revive           | Revive an Ally / +40%. Max Health + Cooldown 2 turns  |
 |   4. Defend           | Increase armor / Armor +30%. for one turn             |
  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯""")
             elif atk == Mage:
                 print(""" –––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
 |   1. Fire Ball        | Basic Attack     (Chance to burn enemies ?)           |
-|   2. Slowing Spell    | Slow the Enemy / Reduce his speed by 1 for one turn   |
+|   2. Weakening Spell  | Weak the Enemy / Enemy Strength -20%. for one turn    |
 |   3. Growing Roots    | Weak an Enemy  / Enemy Armor -20%. for one wave       |
 |   4. Defend           | Increase armor / Armor +30%. for one turn             |
  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯""")
@@ -191,20 +200,40 @@ Turn : {turn}""")
                                     target= None
                                     print('You have no more arrows for this wave.')
 
-                            elif atk_list[index] == Guerrisseur:
-                                print(f"""
-                Allies Healable :
-        {((str(j) + '. ' + str(x.char_name)) for j,x in enumerate(player_group) if (x.is_alive) and (x.Health < x.MaxHealth))}
-                Allies Resurrectable :
-        {((str(j) + '. ' + str(x.char_name)) for j,x in enumerate(player_group) if not x.is_alive)}""")
+                            elif atk_list[index] == Guerisseur:
+                                print("Allies Healable :")
+                                for j,x in enumerate(player_group):
+                                    if (x.is_alive and (x.Health < x.MaxHealth)):
+                                        print(f"{j}. {x.char_name} ({x.Health} => {int(x.Health + (x.MaxHealth * 0.2)) if int(x.Health + (x.MaxHealth * 0.2)) <= x.MaxHealth else f'{x.MaxHealth}'})")
+                                print("Allies Resurrectable :")
+                                for j,x in enumerate(player_group):
+                                    if not x.is_alive:
+                                        print(f"{j}. {x.char_name} ({int(x.MaxHealth * 0.4)})")
                                 if action == 2:
                                     ally = int(input("Wanna heal which ally ?\n "))
+                                    try:
+                                        ally = int(ally)
+                                        if player_group[ally].is_alive:
+                                            pass
+                                    except ValueError:
+                                        print('\n>>> Invalid target, please try again.')
+                                    except IndexError:
+                                        ally = None
+                                        target = None
+
                                     if not ally in range(0,len(player_group)) and player_group[ally].is_alive:
                                         target = None
                                         print('Target must be an alive ally.')
                                 elif action == 3:
                                     if atk_list[index].cooldown == 0:
                                             ally = int(input("Wanna revive wich ally ?\n "))
+                                            try:
+                                                if player_group[ally].is_alive:
+                                                    pass
+                                            except IndexError:
+                                                ally = None
+                                                target = None
+
                                             if not ally in range(0,len(player_group)) and not player_group[ally].is_alive:
                                                 target = None
                                                 print('Target must be a dead ally.')
@@ -224,10 +253,10 @@ Turn : {turn}""")
                             target = 0
                             print("\nHeroes :")
                             for x in player_group:
-                                print(f'{x.char_name}| ID:{x.id}| Vie:{x.Health} ({(x.Health/x.MaxHealth)*100}%)')
+                                print(f'{x.char_name}| ID:{x.id}| Vie:{x.Health} ({(x.Health/x.MaxHealth)*100}%) | Armor: {x.Armor*100}%')
                             print("Monsters :")
                             for y in monster_group[wave]:
-                                print(f'{y.char_name}| ID:{y.id}| Vie:{y.Health} ({(y.Health/y.MaxHealth)*100}%)')
+                                print(f'{y.char_name}| ID:{y.id}| Vie:{y.Health} ({(y.Health/y.MaxHealth)*100}%) | Armor: {y.Armor*100}%')
                         elif action == 9:
                             target = 0
                             for x in player_group:
@@ -240,11 +269,13 @@ Turn : {turn}""")
                             target = int(target)
                         except ValueError:
                             print('\n>>> Invalid target, please try again.')
+                        except TypeError:
+                            pass
                         else: 
                             if (action not in [0,9]) and not (target in range(0, len(Waves[wave]) + 1)):
                                 print('\n>>> Target isn\'t valid! Choose another target.')
                             
-                            if (target == 0) and not (action in [0,4,9]):
+                            if ((target == 0) and not (action in [0,4,9]) and ally == None):
                                 target = None
                                 print('\n>>> Target can\'t be yourself!')
                     
@@ -280,7 +311,7 @@ Turn : {turn}""")
             # init monster action and target with ui() function
                 target,action = self.ai()
                 print(f'{atk_list[index].char_name} has attacked')
-                print(f'Target of the {atk_list[index].char_name} is :', target.char_name)
+                print(f'Target of the {atk_list[index].char_name} is', target.char_name)
 
         # Manage the fight between attacker and target
             if ally == None:
@@ -340,7 +371,7 @@ Turn : {turn}""")
 # AI of the monsters
     def ai(self):
     # Range of random actions of the monster
-        action = random.randint(2,2)
+        action = random.randint(1,1)
     # Range of the random target of the monsters
         target = random.choice([x for x in player_group if x.is_alive == True])
         return target, action
@@ -378,52 +409,99 @@ Turn : {turn}""")
         
         time.sleep(1)
         return turns_list
-# working
+
     def manage_fight(self,attacker,target,action):
     # reset to MaxArmor, cooldown -= 1, Armor + ... ==> Reduce or Resistance/ Armor
         if attacker in player_group:
             attacker.Armor = attacker.BaseArmor
-        attacker.Speed = attacker.BaseSpeed
-        attacker.Damage = attacker.BaseDamage
+            attacker.Damage = attacker.BaseDamage
+        #attacker.Speed = attacker.BaseSpeed
+        ignore_armor = False
 
         attacker.cooldown -=1
         if attacker.cooldown < 0:
             attacker.cooldown = 0
 
     # Test for special attacks of every Heroes
-        if attacker == Guerrier:
-            if action == 2:
-                attacker.Damage += 0.2 * attacker.BaseDamage
-                attacker.Armor += 0.1 * attacker.BaseArmor
-            elif action == 3:
-                attacker.cooldown += 1
-                target.Armor = 1
-        elif attacker == Chasseur:
-            pass
-        elif attacker == Guerrisseur:
-            pass
-        elif attacker == Mage:
-            pass
+        if action in [2,3]:
+            if attacker == Guerrier:
+                if action == 2:
+                    attacker.Damage += 0.2 * attacker.BaseDamage
+                    attacker.Armor += round(0.1 * attacker.BaseArmor,2)
+                elif action == 3:
+                    attacker.cooldown += 1
+                    ignore_armor = True
+                
+                if ignore_armor:
+                    damage = int(attacker.Damage)
+                else:
+                    damage = int(attacker.Damage * target.Armor)
+                target.Health -= damage
 
-        if action == 1:
-            print(f'{attacker.char_name} used Primary Attack.')
-            damage = attacker.Damage * target.Armor
-            target.Health -= damage # vie -= dégats * armure
-            print(f'{attacker.char_name} hit {target.char_name}, dealing {damage} damages.')
-        elif action == 2:
-            print(f'{attacker.char_name} used Secondary Attack.')
-            damage = attacker.Damage
-            target.Health -= damage # vie -= dégats
-            print(f'{attacker.char_name} hit {target.char_name}, dealing {damage} damages.')
-        elif action == 3:
-            print(f'{attacker.char_name} used Special Attack.')
-            damage = attacker.Damage # Create special_attack() function
-            target.Health -= damage # vie -= dégats
-            print(f'{attacker.char_name} hit {target.char_name}, dealing {damage} damages.')
+                print(f"{attacker.char_name} used {'Jump Slash' if action == 2 else 'Spining Attack'}.")
+                print(f"{attacker.char_name} has hit {target.char_name}, dealing {damage} damages.")
+    
+            elif attacker == Chasseur:
+                if action == 2:
+                    ignore_armor = True
+                    attacker.Ammo -= 1
+                elif action == 3:
+                    attacker.Damage += 0.2 * attacker.BaseDamage
+                    attacker.cooldown += 1
+                    ignore_armor = True
+                    attacker.Ammo -= 1
+                
+                if ignore_armor:
+                    damage = int(attacker.Damage)
+                else:
+                    damage = int(attacker.Damage * target.Armor)
+                target.Health -= damage
+
+                print(f"{attacker.char_name} used {'Arrow Shot' if action == 2 else 'Piercing Arrow'} ({attacker.Ammo} Arrows Remaining).")
+                print(f"{attacker.char_name} has hit {target.char_name}, dealing {damage} damages.")
+    # working
+            elif attacker == Guerisseur:
+                if action == 2:
+                    ally = target
+                    heal = int(ally.Health + (ally.MaxHealth * 0.2))
+                    ally.Health = heal
+                    if ally.Health > ally.MaxHealth:
+                        ally.Health = ally.MaxHealth
+                elif action == 3:
+                    ally = target
+                    heal = int(ally.MaxHealth * 0.4)
+                    ally.is_alive = True
+                    ally.Health = heal
+
+                print(f"{attacker.char_name} used {'Heal' if action == 2 else 'Revive'}.")
+                print(f"{attacker.char_name} {f'is healing {ally.char_name} by {heal} HP' if action == 2 else f'is reviving {ally.char_name} from the deads'}.")
+                
+            elif attacker == Mage:
+                if action == 2:
+                    target.Damage = int(target.Damage * 0.8)
+                elif action == 3:
+                    target.Armor *= 1.2
+                    target.Armor = round(target.Armor,2)
+            
+                print(f"{attacker.char_name} used {'Weakening Spell' if action == 2 else 'Growing Roots'}.")
+                print(f"{attacker.char_name} {f'has weakened {target.char_name}' if action == 2 else f'has reduced {target.char_name} Armor by {str(20)}%.'}.")
+
+            elif attacker.camp == 'monster':
+            # Création d'attaques spéciales pour les monstres
+                pass
+
+        elif action == 1:
+            damage = int(attacker.Damage * target.Armor)
+        # print à rallonge
+            print(f"{attacker.char_name} used {'Basic Slash' if (attacker == Guerrier) else 'Knife Cut' if (attacker == Chasseur) else 'Stick Swing' if (attacker == Guerisseur) else 'Fire Ball' if (attacker == Mage) else 'Basic Attack'}.")
+            target.Health -= damage
+            print(f'{attacker.char_name} has hit {target.char_name}, dealing {damage} damages.')
+
         elif action == 4:
             print(f'{attacker.char_name} will block some of the damage recieved during this turn.')
             attacker.Armor *= 1.3
-            print(f'{attacker.char_name} Armor is now at {attacker.Armor}.')
+            attacker.Armor = round(attacker.Armor,2)
+            print(f'{attacker.char_name} Armor is now for this turn at {int(attacker.Armor * 100)}%.')
 
         elif action == 8:
             print(f'Insta killed {target.char_name}')
@@ -431,19 +509,21 @@ Turn : {turn}""")
         
         if target.Health < 0:
             target.Health = 0
-        if action != 4:
+        if action != 4 and ((attacker not in [Mage,Guerisseur]) and (action not in [2,3])):
             print(target.char_name,('ID:' + str(target.id)+' ' if target.camp == 'monster' else '') + 'has now',target.Health,'HP !')
         
-    # Reset of the ?
 # -
 
     def end_game(self):
+    # Écran End Game (pygame)
         pass
 
     def screen_print(self,x,y):
+    # Automatisation Affichages messages à l'écran (pygame)
         pass
 
     def update(self):
+    # Pygame update function or whatever
         pass
 
 def stats(team):
@@ -460,16 +540,16 @@ player_group = []
 
 for char_name in PLAYER_CHARACTERS: # health, attack Speed, damage, armor + max ammo
     if char_name == 'warrior':
-        Guerrier = Chararcter(0,"hero","Guerrier",20,1,14,0.4)
+        Guerrier = Character(0,"hero","Guerrier",20,1,14,0.4)
         player_group.append(Guerrier)
     elif char_name == 'elve':
-        Chasseur = Chararcter(0,"hero","Chasseur",18,3,12,0.8,5)
+        Chasseur = Character(0,"hero","Chasseur",18,3,12,0.8,5)
         player_group.append(Chasseur)
     elif char_name == 'healer':
-        Guerrisseur = Chararcter(0,"hero","Guerrisseur",16,5,8,1.1)
-        player_group.append(Guerrisseur)
+        Guerisseur = Character(0,"hero","Guerisseur",16,5,8,1.1)
+        player_group.append(Guerisseur)
     else:
-        Mage = Chararcter(0,"hero","Mage",16,4,14,0.9)
+        Mage = Character(0,"hero","Mage",16,4,14,0.9)
         player_group.append(Mage)
 
 Enemies = ['Ogre', 'Dragon']
@@ -483,11 +563,11 @@ for wave in Waves:
     row = []
     for char_name in wave:
         if char_name == 'Dragon':
-            Dragon = Chararcter(i,'monster',char_name,60,6,40,0.1)
+            Dragon = Character(i,'monster',char_name,60,6,40,0.1)
             row.append(Dragon)
         else:
             i +=1 # id des monstres ==> différencier tel ou tel monstre
-            Ogre = Chararcter(i,'monster',char_name,20,2,8,0.6)
+            Ogre = Character(i,'monster',char_name,20,2,8,0.6)
             row.append(Ogre)
     monster_group.append(row)
     i = Waves.index(wave)
@@ -503,32 +583,32 @@ stats(player_group); stats(Enemies)
 
 """"""
 Game = Fight()
-for wave_number in range(1,len(Waves)):
+for wave_number in range(0,len(Waves)):
     Game.main(wave_number)
 """ liste des attaques: / Cooldown = can't play for x turn(s)
 Guerrier (Humain):
-1. Basic slash
-2. Jump slash / take +10% more dmg this turn
-3. Spin attack / cooldown of 1 turn
-4. Defense
+|   1. Basic Slash      | Basic Attack                                          |
+|   2. Jump Slash       | + 20%. of damages  / Armor -10%                       |
+|   3. Spin Attack      | Ignore Enemy Armor / Cooldown of 1 turn               |
+|   4. Defend           | Increase armor     / Armor +30%. for one turn         |
 
 Chasseur (Elfe) :
-1. Knife cut
-2. Arrow shot / max five arrows per wave
-3. Fire arrow / cost 1 arrow + cooldown of 1 turn
-4. Defense
+|   1. Knife Cut        | Basic Attack                                          |
+|   2. Arrow Shot       | Ignore Enemy Armor / Maximum: 5 arrows per wave       |
+|   3. Piercing Arrow   | +20%. of damages   / Cooldown of 1 turn               |
+|   4. Defend           | Increase armor     / Armor +30%. for one turn         |
 
-Guerrisseur (??) :
-1. Stick Swing
-2. Heal Ally / cost 10% hp (can cause death)
-3. Revive Ally / cooldown of 2 turns
-4. Defense
+Guerisseur (??) :
+|   1. Stick Swing      | Basic Attack                                          |
+|   2. Heal             | Heal an Ally   / +20%. of Ally Max Health             |
+|   3. Revive           | Revive an Ally / Backslash (40%.) + Cooldown 2 turns  |
+|   4. Defend           | Increase armor / Armor +30%. for one turn             |
 
 Mage (Arcaniste) :
-1. Fire Ball
-2. Slowing Spell / reduce speed of an Enemy by 1
-3. Growing roots / reduce Armor of an Enemy by 20% (so increase Armor multiplicator)
-4. Defense
+|   1. Fire Ball        | Basic Attack     (Chance to burn enemies ?)           |
+|   2. Weakening Spell  | Weak the Enemy / Enemy Strength -20%. for one turn    |
+|   3. Growing Roots    | Weak an Enemy  / Enemy Armor -20%. for one wave       |
+|   4. Defend           | Increase armor / Armor +30%. for one turn             |
 """
 
 
@@ -559,7 +639,7 @@ DAMAGE = 12
 ARMOR = 0.8
 AMMO = 5
 
-Guerrisseur:
+Guerisseur:
 HEALTH = 16
 SPEED = 5
 DAMAGE = 8
