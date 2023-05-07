@@ -1,5 +1,5 @@
 from sprites import *
-from fight import *
+#from fight import *
 from button import *
 
 #button images
@@ -35,7 +35,7 @@ class Game:
         self.wave_num = 0
         self.playing = True
     #Call Player class in Sprites
-        self.player = Sprite(2, 1)
+        self.player = Sprite(1)
     # Init screen
         window.fill(COLOR_UI)
         window.blit(self.player.tiles.image,screen)

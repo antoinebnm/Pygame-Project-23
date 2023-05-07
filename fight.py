@@ -1,11 +1,36 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
+from config import *
 
-#from config import *
-import time, random
 
-PLAYER_CHARACTERS = ['warrior','elve','healer','mage']
-DEBUG = False
+HEROES_ACTIONS_BUFFS = {
+    'Basic': None,
+    'Basic Slash' : False,
+    'Knife Cut' : False,
+    'Wand Swing' : False,
+    'Fire Ball' : False,
+
+    'Secondary': None,
+    'Jump Slash' : {'Damage': +0.2, 'Armor': -0.1},
+    'Arrow Shot' : {'Ammo': -1},
+    'Heal' : {'Heal': +0.2},
+    'Weakening Spell' : {'Enemy Strength': -0.2},
+    
+    'Special': None,
+    'Spinning Attack' : {'Cooldown': +1},
+    'Piercing Arrow' : {'Damage': +0.2, 'Ammo': -1, 'Cooldown': +1},
+    'Revive' : {'Cooldown': +2, 'Heal': +0.4},
+    'Growing Roots' : {'Enemy Armor': -0.2},
+
+    'Defense' : {'Armor': +0.3}
+}
+
+INVENTORY = {
+    'Money': 0,
+    'Heal Potions': 0,
+    'Warrior Upgrade': False,
+    'Archer Upgrade': False,
+    'Healer Upgrade': False,
+    'Mage Upgrade': False
+}
 
 SAVE = False
 
@@ -104,7 +129,7 @@ Turn : {turn}""")
                 # working
             elif atk == Guerisseur:
                 print(""" –––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
-|   1. Stick Swing      | Basic Attack                                          |
+|   1. Wand Swing       | Basic Attack                                          |
 |   2. Heal             | Heal an Ally   / +20%. of Ally Max Health             |
 |   3. Revive           | Revive an Ally / +40%. Max Health + Cooldown 2 turns  |
 |   4. Defend           | Increase armor / Armor +30%. for one turn             |
@@ -579,12 +604,16 @@ Waves = monster_group
 Players = player_group
 Enemies = [Ogre, Dragon]
 
-stats(player_group); stats(Enemies)
 
-""""""
-Game = Fight()
+FightSyst = Fight()
+
+"""
+stats(player_group); stats(Enemies)
 for wave_number in range(0,len(Waves)):
     Game.main(wave_number)
+"""
+
+
 """ liste des attaques: / Cooldown = can't play for x turn(s)
 Guerrier (Humain):
 |   1. Basic Slash      | Basic Attack                                          |
@@ -599,7 +628,7 @@ Chasseur (Elfe) :
 |   4. Defend           | Increase armor     / Armor +30%. for one turn         |
 
 Guerisseur (??) :
-|   1. Stick Swing      | Basic Attack                                          |
+|   1. Wand Swing       | Basic Attack                                          |
 |   2. Heal             | Heal an Ally   / +20%. of Ally Max Health             |
 |   3. Revive           | Revive an Ally / Backslash (40%.) + Cooldown 2 turns  |
 |   4. Defend           | Increase armor / Armor +30%. for one turn             |

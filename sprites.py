@@ -1,11 +1,9 @@
 from tilesheet import *
 
 class Sprite():
-    def __init__(self, view, scale):
-        self._layer = PLAYER_LAYER
+    def __init__(self, scale):
         self.sprite_animation = 'stand'
         self.num_tileset = [0,0,0,0]
-        self.view = view
 
         self.w = TILE_SIZE
         self.h = TILE_SIZE
@@ -20,10 +18,10 @@ class Sprite():
         self.sprite_frame = 1
         self.facing_sprite = 12
 
-        if self.view == 2:
+        if MAP_VIEW:
             self.x = SCREEN_WIDTH // 400
             self.y = self.tiles.ground
-        elif self.view == 2.5:
+        elif MAP_VIEW:
             self.x = SCREEN_WIDTH // 30
             self.y = SCREEN_HEIGHT // 2
 
@@ -68,7 +66,7 @@ class Sprite():
         for character in PLAYER_CHARACTERS:
             i = PLAYER_CHARACTERS.index(character)
             memory.append(self.get_sprite(character, self.sprite_frame, self.facing_sprite))
-            window.blit(self.team_sprites[i], (self.x + (i*30), self.y))
+            window.blit(self.team_sprites[i], (self.x + 90 - (i*30), self.y))
        
         #self.player_collider = self.team_sprites.get_rect(topleft=(x + 16, y + 48), width=24, height=16)
 

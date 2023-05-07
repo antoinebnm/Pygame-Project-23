@@ -52,7 +52,7 @@ COLOR_WHITE = pygame.color.Color(255,255,255)
 #                         Layers Levels                           #
 #                                                                 #
 ###################################################################
-PLAYER_LAYER = 1
+MAP_VIEW = 2
 ground_h = pygame.image.load(level_path + 'Forest/layers/ground_layer.png').convert_alpha().get_height()
 GROUND_LEVEL = SCREEN_HEIGHT - ((LOWER_MARGIN + ground_h)//2) + 10
 
