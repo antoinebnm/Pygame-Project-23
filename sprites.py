@@ -26,8 +26,10 @@ class Sprite():
             self.y = SCREEN_HEIGHT // 2
 
         self.assign_sprite_tileset()
+        
         if DEBUG:
-            self.player_collider = pygame.rect.Rect(self.team_sprites.get_rect(topleft=(self.x + 16, self.y + 48), width=24, height=16))
+            if MAP_VIEW == 2.5:
+                self.player_collider = pygame.rect.Rect(self.team_sprites.get_rect(topleft=(self.x + 16, self.y + 48), width=24, height=16))
 
 
 # Chargement tileset du chararcter / à automatiser avec interface
@@ -67,8 +69,10 @@ class Sprite():
             i = PLAYER_CHARACTERS.index(character)
             memory.append(self.get_sprite(character, self.sprite_frame, self.facing_sprite))
             window.blit(self.team_sprites[i], (self.x + 90 - (i*30), self.y))
-       
-        #self.player_collider = self.team_sprites.get_rect(topleft=(x + 16, y + 48), width=24, height=16)
+
+        if DEBUG:
+            if MAP_VIEW == 2.5:
+                self.player_collider = self.team_sprites.get_rect(topleft=(x + 16, y + 48), width=24, height=16)
 
 # FONCTION UPDATE / récurrence
     def update(self, COUNTER):

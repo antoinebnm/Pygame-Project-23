@@ -1,38 +1,6 @@
 from config import *
 
-
-HEROES_ACTIONS_BUFFS = {
-    'Basic': None,
-    'Basic Slash' : False,
-    'Knife Cut' : False,
-    'Wand Swing' : False,
-    'Fire Ball' : False,
-
-    'Secondary': None,
-    'Jump Slash' : {'Damage': +0.2, 'Armor': -0.1},
-    'Arrow Shot' : {'Ammo': -1},
-    'Heal' : {'Heal': +0.2},
-    'Weakening Spell' : {'Enemy Strength': -0.2},
-    
-    'Special': None,
-    'Spinning Attack' : {'Cooldown': +1},
-    'Piercing Arrow' : {'Damage': +0.2, 'Ammo': -1, 'Cooldown': +1},
-    'Revive' : {'Cooldown': +2, 'Heal': +0.4},
-    'Growing Roots' : {'Enemy Armor': -0.2},
-
-    'Defense' : {'Armor': +0.3}
-}
-
-INVENTORY = {
-    'Money': 0,
-    'Heal Potions': 0,
-    'Warrior Upgrade': False,
-    'Archer Upgrade': False,
-    'Healer Upgrade': False,
-    'Mage Upgrade': False
-}
-
-SAVE = False
+ui_rect = pygame.rect.Rect(screen.left, screen.bottom, window.get_width(), LOWER_MARGIN)
 
 class Character():
     def __init__(self, id, camp, char_name, health, speed, damage, armor, ammo=None,x=0, y=0, scale=1):
@@ -195,6 +163,7 @@ Turn : {turn}""")
             if (atk_list[index] != None) and (atk_list[index] in player_group):
                 while security:
                     action = input("\n>>> Choose your move :\n ")
+                    text_write(600, int((ui_rect.height//15) * 2), '>>> Choose your move :')
                     try :
                         action = int(action)
                     except ValueError:
@@ -288,7 +257,7 @@ Turn : {turn}""")
                                 x.Health = x.MaxHealth
                                 x.is_alive = True
                             print('All heroes have been healed / revived.')
-                        else: action = None; target = None
+                        else: print('\n>>> Invalid action, please try again.'); action = None; target = None
 
                         try:
                             target = int(target)
@@ -551,6 +520,26 @@ Turn : {turn}""")
     # Pygame update function or whatever
         pass
 
+
+def text_write(x, y, text='default text', scale=1):
+    scale = float(scale)
+    text = font.render(text, False, COLOR_WHITE).convert_alpha()
+    text = pygame.transform.scale_by(text,scale)
+    text_rect = text.get_rect()
+    y += SCREEN_HEIGHT # adjust to bottom of screen / ui
+    text_rect.topleft = ((x),(y))
+    window.blit(text, text_rect)
+
+def text_update():
+    window.fill(COLOR_UI,ui_rect)
+# UI indicator
+    text_write(100, int((ui_rect.height//15) * 2), 'Health points :')
+    text_write(100,int((ui_rect.height//15) * 4), 'Ammo :')
+    text_write(100,int((ui_rect.height//15) * 6), 'Current Attacker :')
+    text_write(100,int((ui_rect.height//15) * 8), 'Next Attacker :')
+    text_write(700,int((ui_rect.height//15) * 2), 'Test 2')
+
+
 def stats(team):
     print("–––––––––––––––––––––––––––––––––––––")
     for member in team:
@@ -607,10 +596,11 @@ Enemies = [Ogre, Dragon]
 
 FightSyst = Fight()
 
-"""
-stats(player_group); stats(Enemies)
+
+"""stats(player_group); stats(Enemies)
 for wave_number in range(0,len(Waves)):
-    Game.main(wave_number)
+    #text_write(400,((-1) * SCREEN_HEIGHT + 60), ('Wave n°' + str(wave_number)),2.4)
+    FightSyst.main(wave_number)
 """
 
 

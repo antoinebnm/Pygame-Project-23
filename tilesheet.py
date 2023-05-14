@@ -16,10 +16,7 @@ class Map:
         window.blit(self.image, screen)
     
     def update(self,COUNTER):
-        if self.memory != window.get_size():
-            self.image = pygame.transform.scale(self.image, screen.size)
-            self.ground = SCREEN_HEIGHT
-            self.memory = window.get_size()
+        pass
 
 
     def scroll_map(self, x):
