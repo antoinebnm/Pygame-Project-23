@@ -36,25 +36,26 @@ class Game:
 
     # Reset datas
         """ To do """
-        self.wave_num = 0
+        FightSyst.wave_num = 0
         self.playing = True
     #Call Player class in Sprites
         self.player = Sprite(1)
     # Init screen
         window.fill(COLOR_UI)
         window.blit(self.player.tiles.image,screen)
-        text_update()
+        ui_update()
 
 
     # Handle user input events
     def events(self):
         keys = pygame.key.get_pressed()
-        #mouse_coord = pygame.mouse.get_pos()
-
+        mouse_coord = pygame.mouse.get_pos()
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
                 pygame.quit()
+
             elif event.type == pygame.VIDEORESIZE:
                 screen = pygame.display.set_mode(
                 event.dict['size'], pygame.HWSURFACE | pygame.DOUBLEBUF | pygame.RESIZABLE)
@@ -80,10 +81,11 @@ class Game:
 
         if keys[pygame.K_RETURN]:
             self.ind +=1
-            if self.ind >= len(PLAYER_CHARACTERS):
+            print(player_group)
+            if self.ind >= len(player_group):
                 self.ind = 0
-            self.atker = PLAYER_CHARACTERS[self.ind]
-            time.sleep(0.6)
+            self.atker = player_group[self.ind]
+            time.sleep(1)
 
         if not self.menu:
             menubg = False
@@ -93,6 +95,7 @@ class Game:
                     menubg = True
                     menu_bg = pygame.transform.smoothscale(menu_img, window.get_size())
                     window.blit(menu_bg,window.get_rect())
+
         if self.menu:
             if keys[pygame.K_SPACE]:
                 self.menu = False
@@ -102,13 +105,16 @@ class Game:
 
     # Update the game state based on user input and object behavior
     def update(self):
-        self.player.update(self.COUNTER)
-        text_update()
+        
+        if self.playing:
+            self.COUNTER += 1
+            self.player.update(self.COUNTER)
+            ui_update()
 
-        for atk in PLAYER_CHARACTERS:
-            if self.atker == atk:
-                img = pygame.image.load(img_path + atk + "_char.png").convert_alpha()
-                window.blit(img, (390,686))
+            for atk in player_group:
+                if self.atker == atk:
+                    text_write(350,int((ui_rect.height//15) * 12),str(atk.char_name))
+
 
     # Main game loop
     def run(self):
@@ -131,18 +137,14 @@ class Game:
             self.init_game = False
 
         if self.playing:
-            self.COUNTER += 1
-    
             self.events()
+            self.update() if not self.menu else None
+            #FightSyst.main(FightSyst.wave_num) if FightSyst.wave_num in range(len(Waves)) else FightSyst.end_game()
 
-            if not self.menu:
-                self.atker
-                self.update()
-    
-        """if DEBUG:
-            window.fill(pygame.color.Color(255,0,0), self.player.player_collider)
-            pygame.display.set_caption("Facing %s" % (self.player.player_facing))
-"""
+#        if DEBUG:
+        coords = pygame.mouse.get_pos()
+        pygame.display.set_caption(f"Mouse Coords: x:{coords[0]} | y:{coords[1]}")
+
         # Update display and tick clock
         clock.tick(FPS)
         pygame.display.update()

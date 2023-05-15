@@ -40,20 +40,23 @@ class Fight():
             self.reset_vars()
     
     def main(self, wave):
-    # Basic variables
-        self.win_team = None
-        self.wave_ended = False
-        self.fight_ended = False
+        self.wave_num = wave
+        if wave in range(len(Waves)):
+            # Basic variables
+            self.win_team = None
+            self.wave_ended = False
+            self.fight_ended = False
 
-    # Si chasseur en vie, refill des 5 flèches en début de manche
-        for hero in player_group:
-            if (hero == Chasseur) and (hero.is_alive):
-                hero.Ammo = hero.MaxAmmo
+            # Si chasseur en vie, refill des 5 flèches en début de manche
+            for hero in player_group:
+                if (hero == Chasseur) and (hero.is_alive):
+                    hero.Ammo = hero.MaxAmmo
 
-        self.win_team = self.fight_syst(wave)
-        if self.fight_ended:
-        # Si combat fini, alors mettre fin au combat / à automatiser + adapter à pygame /!\
-            self.fight_end(self.win_team)
+            self.win_team = self.fight_syst(wave)
+            if self.fight_ended:
+            # Si combat fini, alors mettre fin au combat / à automatiser + adapter à pygame /!\
+                self.fight_end(self.win_team)
+
 
     def load_vars(self):
     # Load variables on a json file
@@ -62,6 +65,13 @@ class Fight():
     def reset_vars(self):
     # Reset variables on a json file
         pass
+
+
+    def end_game(self):
+    # Écran End Game (pygame)
+        pass
+
+
 
     def ui(self,wave,turn,atk): # / adapt to pygame /!\
         self.is_alive(wave, False)
@@ -162,8 +172,9 @@ Turn : {turn}""")
 
             if (atk_list[index] != None) and (atk_list[index] in player_group):
                 while security:
-                    action = input("\n>>> Choose your move :\n ")
                     text_write(600, int((ui_rect.height//15) * 2), '>>> Choose your move :')
+                    action : input("\n>>> Choose your move :\n ")
+                    
                     try :
                         action = int(action)
                     except ValueError:
@@ -207,8 +218,7 @@ Turn : {turn}""")
                                     ally = int(input("Wanna heal which ally ?\n "))
                                     try:
                                         ally = int(ally)
-                                        if player_group[ally].is_alive:
-                                            pass
+                                        player_group[ally].is_alive
                                     except ValueError:
                                         print('\n>>> Invalid target, please try again.')
                                     except IndexError:
@@ -222,8 +232,7 @@ Turn : {turn}""")
                                     if atk_list[index].cooldown == 0:
                                             ally = int(input("Wanna revive wich ally ?\n "))
                                             try:
-                                                if player_group[ally].is_alive:
-                                                    pass
+                                                player_group[ally].is_alive
                                             except IndexError:
                                                 ally = None
                                                 target = None
@@ -261,10 +270,8 @@ Turn : {turn}""")
 
                         try:
                             target = int(target)
-                        except ValueError:
+                        except:
                             print('\n>>> Invalid target, please try again.')
-                        except TypeError:
-                            pass
                         else: 
                             if (action not in [0,9]) and not (target in range(0, len(Waves[wave]) + 1)):
                                 print('\n>>> Target isn\'t valid! Choose another target.')
@@ -508,19 +515,6 @@ Turn : {turn}""")
         
 # -
 
-    def end_game(self):
-    # Écran End Game (pygame)
-        pass
-
-    def screen_print(self,x,y):
-    # Automatisation Affichages messages à l'écran (pygame)
-        pass
-
-    def update(self):
-    # Pygame update function or whatever
-        pass
-
-
 def text_write(x, y, text='default text', scale=1):
     scale = float(scale)
     text = font.render(text, False, COLOR_WHITE).convert_alpha()
@@ -530,14 +524,16 @@ def text_write(x, y, text='default text', scale=1):
     text_rect.topleft = ((x),(y))
     window.blit(text, text_rect)
 
-def text_update():
+def ui_update():
     window.fill(COLOR_UI,ui_rect)
 # UI indicator
-    text_write(100, int((ui_rect.height//15) * 2), 'Health points :')
-    text_write(100,int((ui_rect.height//15) * 4), 'Ammo :')
-    text_write(100,int((ui_rect.height//15) * 6), 'Current Attacker :')
-    text_write(100,int((ui_rect.height//15) * 8), 'Next Attacker :')
-    text_write(700,int((ui_rect.height//15) * 2), 'Test 2')
+    for i,char in enumerate(player_group):
+        text_write(30, int((ui_rect.height//15))+ (i* 30),str(char.char_name))
+        text_write(30, int((ui_rect.height//15))+ (i* 30), 'HP :')
+        if char == Chasseur:
+            text_write(30,int((ui_rect.height//15) * 3)+ (i* 30), 'Ammo :')
+    text_write(60,int((ui_rect.height//15) * 12), 'Current Attacker :')
+    text_write(60,int((ui_rect.height//15) * 13), 'Next Attacker :')
 
 
 def stats(team):
@@ -593,11 +589,11 @@ Waves = monster_group
 Players = player_group
 Enemies = [Ogre, Dragon]
 
+if DEBUG: stats(player_group); stats(Enemies)
 
 FightSyst = Fight()
 
-
-"""stats(player_group); stats(Enemies)
+"""
 for wave_number in range(0,len(Waves)):
     #text_write(400,((-1) * SCREEN_HEIGHT + 60), ('Wave n°' + str(wave_number)),2.4)
     FightSyst.main(wave_number)

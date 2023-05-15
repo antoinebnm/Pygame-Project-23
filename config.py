@@ -1,4 +1,5 @@
 import pygame, random, sys, math, random, time, csv, os, json
+
 #from pygame.locals import *
 
 PATH = os.path.dirname(__file__)
@@ -47,8 +48,31 @@ font = pygame.font.Font((fonts_path + '8bit_wonder/8-BITWONDER.ttf'),16)
 clock = pygame.time.Clock()
 
 
+###################################################################
+#                                                                 #
+#                     Thread Parallel Tasks                       #
+#                                                                 #
+###################################################################
+from concurrent.futures import ThreadPoolExecutor
 
+def run_io_tasks_in_parallel(tasks):
+    with ThreadPoolExecutor() as executor:
+        running_tasks = [executor.submit(task) for task in tasks]
+        for running_task in running_tasks:
+            try:
+                running_task.result()
+            except TypeError:
+                pass
+        
+        executor.shutdown()
+"""
+print(ThreadPoolExecutor()._max_workers)
 
+run_io_tasks_in_parallel([
+    lambda: funcA(),
+    lambda: funcB(),
+])
+"""
 
 ###################################################################
 #                                                                 #

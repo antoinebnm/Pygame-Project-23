@@ -12,20 +12,32 @@ print(Time[1])"""
 from concurrent.futures import ThreadPoolExecutor
 
 def run_io_tasks_in_parallel(tasks):
-    with ThreadPoolExecutor() as executor:
+    with ThreadPoolExecutor(max_workers=8) as executor:
         running_tasks = [executor.submit(task) for task in tasks]
         for running_task in running_tasks:
             running_task.result()
+        
+        executor.shutdown()
 
 def funcA():
-    time.sleep(3)
+    print('Wait 4sec for A')
+    for t in range(4):
+        time.sleep(1)
+        print("A:"+str(t+1))
     print("A")
 
 def funcB():
-    time.sleep(1)
+    print('Wait 1sec for B')
+    for t in range(1):
+        time.sleep(1)
+        print("B:"+str(t+1))
     print("B")
 
-run_io_tasks_in_parallel([
+
+print(ThreadPoolExecutor()._max_workers)
+
+for i in range (3):
+    run_io_tasks_in_parallel([
     lambda: funcA(),
     lambda: funcB(),
 ])
