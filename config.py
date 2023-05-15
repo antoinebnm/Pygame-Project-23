@@ -15,8 +15,10 @@ pygame.display.init()
 #                                                                 #
 ###################################################################
 # 1600x900 | 1440×900 | 1280×720 
-SCREEN_WIDTH, SCREEN_HEIGHT = pygame.display.get_desktop_sizes()[0][0]*0.7,pygame.display.get_desktop_sizes()[0][1]*0.7
-LOWER_MARGIN = SCREEN_HEIGHT // 4
+SCREEN_WIDTH, SCREEN_HEIGHT = pygame.display.get_desktop_sizes()[0][0]*0.8,pygame.display.get_desktop_sizes()[0][1]*0.8
+LOWER_MARGIN = SCREEN_HEIGHT // 2.6
+SCREEN_HEIGHT -= LOWER_MARGIN
+
 
 TILE_SIZE = 32
 TILE_MARGIN = 0
@@ -27,7 +29,6 @@ FPS = 60
 RESIZE = False
 DEBUG = False
 SAVE = False
-
 
 if RESIZE:
     window = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT + LOWER_MARGIN),pygame.HWSURFACE | pygame.DOUBLEBUF | pygame.RESIZABLE)
@@ -65,8 +66,8 @@ COLOR_MENU = pygame.color.Color(20,160,130)
 #                                                                 #
 ###################################################################
 MAP_VIEW = 2
-ground_h = pygame.image.load(level_path + 'Forest/layers/ground_layer.png').convert_alpha().get_height()
-GROUND_LEVEL = SCREEN_HEIGHT - ((LOWER_MARGIN + ground_h)//2) + 10
+
+GROUND_LEVEL = SCREEN_HEIGHT - ((LOWER_MARGIN)//(3.3)) - 8
 
 
 ###################################################################

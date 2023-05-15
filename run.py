@@ -3,6 +3,7 @@
 
 from game import *
 
+#FightSyst.main(0)
 
 game = Game()
 

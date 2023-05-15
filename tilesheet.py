@@ -9,6 +9,7 @@ class Map:
         self.level = Levels('Forest')
         image = pygame.image.load((level_path + self.level.map + '/Preview/Background.png')).convert()
         self.image = pygame.transform.smoothscale(image, screen.size)
+        
         self.ground = GROUND_LEVEL
         self.memory = window.get_size()
         self.scroll = 0
@@ -23,6 +24,7 @@ class Map:
         i=0
         while(i < self.offset):
             window.blit(self.image, (self.image.get_width() * i + self.scroll, 0))
+            
             i += 1
         # FRAME FOR SCROLLING
         self.scroll -= x * PLAYER_RUN

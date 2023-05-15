@@ -31,6 +31,9 @@ class Game:
 
 ### Fonction initialisation d'une nouvelle partie
     def new_game(self):
+        self.atker = "warrior"
+        self.ind = 0
+
     # Reset datas
         """ To do """
         self.wave_num = 0
@@ -57,12 +60,9 @@ class Game:
                 event.dict['size'], pygame.HWSURFACE | pygame.DOUBLEBUF | pygame.RESIZABLE)
                 
                 if self.playing and not self.menu:
-                    if self.playing:
-                        image = self.player.tiles.image
-                    elif self.menu:
-                        image = menu_img
+                    image = self.player.tiles.image
                     screen.blit(pygame.transform.scale(image, event.dict['size']), (0, 0))
-                elif not self.playing:
+                if not self.playing:
                     window.fill(COLOR_MENU)
                     size = [round(event.dict['size'][0] / 1120, 2), round(event.dict['size'][1] / 620, 2)]
                     size = size[0] * size[1]
@@ -72,10 +72,18 @@ class Game:
                     self.load_button = Button(event.dict['size'][0] // 2, event.dict['size'][1] // 2 + self.ind*0.5, load_img, size * 0.6)
                     self.option_button = Button(event.dict['size'][0] // 2, event.dict['size'][1] // 2 + self.ind*1, option_img, size * 0.6)
                     self.exit_button = Button(event.dict['size'][0] // 2, event.dict['size'][1] // 2 + self.ind*1.5, exit_img, size * 0.6)
-                elif self.menu:
-                    screen.blit(pygame.transform.scale(menu_bg, event.dict['size']), (0, 0))
+                if self.menu:
+                    image = menu_img
+                    screen.blit(pygame.transform.scale(image, event.dict['size']), (0, 0))
 
                 pygame.display.flip()
+
+        if keys[pygame.K_RETURN]:
+            self.ind +=1
+            if self.ind >= len(PLAYER_CHARACTERS):
+                self.ind = 0
+            self.atker = PLAYER_CHARACTERS[self.ind]
+            time.sleep(0.6)
 
         if not self.menu:
             menubg = False
@@ -96,6 +104,11 @@ class Game:
     def update(self):
         self.player.update(self.COUNTER)
         text_update()
+
+        for atk in PLAYER_CHARACTERS:
+            if self.atker == atk:
+                img = pygame.image.load(img_path + atk + "_char.png").convert_alpha()
+                window.blit(img, (390,686))
 
     # Main game loop
     def run(self):
@@ -123,6 +136,7 @@ class Game:
             self.events()
 
             if not self.menu:
+                self.atker
                 self.update()
     
         """if DEBUG:
