@@ -22,6 +22,7 @@ class Game:
         self.running = True
         self.COUNTER = 0
         self.init_game = False
+        self.fighting = False
 
         self.ind = newg_img.get_height() + 20
         self.newg_button = Button(SCREEN_WIDTH // 2, (SCREEN_HEIGHT // 2) + self.ind*0, newg_img, 0.6)
@@ -139,7 +140,11 @@ class Game:
         if self.playing:
             self.events()
             self.update() if not self.menu else None
-            #FightSyst.main(FightSyst.wave_num) if FightSyst.wave_num in range(len(Waves)) else FightSyst.end_game()
+            if not self.fighting:
+                fight_thread = threading.Thread(target=FightSyst.main(FightSyst.wave_num) if FightSyst.wave_num in range(len(Waves)) else FightSyst.end_game())
+                fight_thread.start()
+                self.fighting = True
+                
 
 #        if DEBUG:
         coords = pygame.mouse.get_pos()
