@@ -56,6 +56,7 @@ class Game:
             if event.type == pygame.QUIT:
                 self.running = False
                 pygame.quit()
+                raise SystemExit
 
             elif event.type == pygame.VIDEORESIZE:
                 screen = pygame.display.set_mode(
@@ -141,7 +142,10 @@ class Game:
             self.events()
             self.update() if not self.menu else None
             if not self.fighting:
-                fight_thread = threading.Thread(target=FightSyst.main(FightSyst.wave_num) if FightSyst.wave_num in range(len(Waves)) else FightSyst.end_game())
+                if FightSyst.wave_num in range(len(Waves)):
+                    fight_thread = threading.Thread(target=FightSyst.main, daemon=True, args=[FightSyst.wave_num], name="FightSystem")
+                else:
+                    fight_thread = threading.Thread(target=FightSyst.end_game, daemon=True, name="FightSystem")
                 fight_thread.start()
                 self.fighting = True
                 

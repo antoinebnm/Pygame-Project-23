@@ -8,7 +8,7 @@ Time.append(int(time.time() - Time[0]-1))
 print(Time[1])"""
 
 #print("Version: "+'.'.join([str(x) for x in sys.version_info if x in [3,11]]))
-"""
+
 from concurrent.futures import ThreadPoolExecutor
 
 def run_io_tasks_in_parallel(tasks):
@@ -39,7 +39,7 @@ run_io_tasks_in_parallel([
     lambda: funcA(),
     lambda: funcB()
 ])
-"""
+
 
 
 import multiprocessing

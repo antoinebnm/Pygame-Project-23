@@ -33,6 +33,7 @@ class Character():
 
 class Fight():
     def __init__(self):
+        self.EVENT = ''
     # Reset or not if no saves
         if SAVE == True:
             self.load_vars()
@@ -45,7 +46,7 @@ class Fight():
             # Basic variables
             self.win_team = None
             self.wave_ended = False
-            self.fight_ended = False
+            self.fighting = True
 
             # Si chasseur en vie, refill des 5 flèches en début de manche
             for hero in player_group:
@@ -53,7 +54,7 @@ class Fight():
                     hero.Ammo = hero.MaxAmmo
 
             self.win_team = self.fight_syst(wave)
-            if self.fight_ended:
+            if not self.fighting:
             # Si combat fini, alors mettre fin au combat / à automatiser + adapter à pygame /!\
                 self.fight_end(self.win_team)
 
@@ -131,8 +132,9 @@ Turn : {turn}""")
     def fight_syst(self,wave):
         turn = 0
         index = -1
+        self.fighting = True
 
-        if not self.fight_ended:
+        if self.fighting:
             self.wave_ended = False
             print("–––––––––––––––––––––––––––––––––––––")
             print("\nStart of the wave number",str(wave+1))
@@ -172,13 +174,15 @@ Turn : {turn}""")
 
             if (atk_list[index] != None) and (atk_list[index] in player_group):
                 while security:
-                    text_write(600, int((ui_rect.height//15) * 2), '>>> Choose your move :')
-                    action : input("\n>>> Choose your move :\n ")
+                    self.EVENT = 'action'
+                    action = input("\n>>> Choose your move :\n ")
                     
                     try :
                         action = int(action)
                     except ValueError:
                         print('\n>>> Invalid action, please try again.')
+                    except TypeError:
+                        pass
                     else:
                         if action in [2,3]:
                             if atk_list[index] == Guerrier:
@@ -331,7 +335,7 @@ Turn : {turn}""")
                 if Mdeads == len(monster_group[wave]):
                     win_team = 'heroes'
                     self.wave_ended = True
-                    self.fight_ended = True
+                    self.fighting = False
                     break
 
             for member in player_group:
@@ -341,7 +345,7 @@ Turn : {turn}""")
                 if Pdeads == len(player_group):
                     win_team = 'monsters'
                     self.wave_ended = True
-                    self.fight_ended = True
+                    self.fighting = False
                     break
         # ---- End of the while wave loop ----
         return win_team
@@ -360,6 +364,7 @@ Turn : {turn}""")
             if DEBUG and out: print(f'check alive monster {character.char_name}{character.id}: {character.is_alive}')
 
     def fight_end(self,win_team):
+        self.fighting = False
         print('\n-\nVague terminée\n-')
         if win_team == 'monsters':
             print('Game lost')
@@ -526,6 +531,7 @@ def text_write(x, y, text='default text', scale=1):
 
 def ui_update():
     window.fill(COLOR_UI,ui_rect)
+    EVENT = FightSyst.EVENT
 # UI indicator
     for i,char in enumerate(player_group):
         text_write(30, int((ui_rect.height//15))+ (i* 30),str(char.char_name))
@@ -534,7 +540,14 @@ def ui_update():
             text_write(30,int((ui_rect.height//15) * 3)+ (i* 30), 'Ammo :')
     text_write(60,int((ui_rect.height//15) * 12), 'Current Attacker :')
     text_write(60,int((ui_rect.height//15) * 13), 'Next Attacker :')
-
+    
+    try:
+        EVENT = str(EVENT).lower()
+    except:
+        pass
+    else:
+        if EVENT == 'action':
+            text_write(600, int((ui_rect.height//15) * 2), 'Choose your move :')
 
 def stats(team):
     print("–––––––––––––––––––––––––––––––––––––")
