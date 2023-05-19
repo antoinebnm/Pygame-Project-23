@@ -75,13 +75,13 @@ class Sprite():
                 self.player_collider = self.team_sprites.get_rect(topleft=(x + 16, y + 48), width=24, height=16)
 
 # FONCTION UPDATE / récurrence
-    def update(self, COUNTER):
+    def update(self):
         self.movements()
-        self.animation(COUNTER)
+        self.animation()
 # redraw du sprite après check de l'animation
         self.draw_sprite(self.x,self.y)
 
-    def animation(self, COUNTER):
+    def animation(self):
         if self.sprite_animation == 'walk':
             if self.player_facing == 'left':
                 self.facing_sprite = 10
@@ -95,13 +95,14 @@ class Sprite():
         else:
             self.sprite_animation = 'stand'
 
-        self.animate_frames(COUNTER)
+        self.animate_frames()
 
-    def animate_frames(self, COUNTER):
+    def animate_frames(self):
         if self.sprite_animation == 'walk':
             if (self.sprite_frame < 9):
-                if ((COUNTER % 6)==0):
-                    self.sprite_frame += 1
+                pass # DO CLOCK
+                #if ((pygame % 6)==0):
+                #    self.sprite_frame += 1
             else:
                 self.sprite_frame = 1
         if self.sprite_animation == 'stand':
@@ -109,5 +110,4 @@ class Sprite():
 
     def movements(self):
         keys = pygame.key.get_pressed()
-        if keys[PLAYER_RIGHT_KEY]:
-            self.tiles.scroll_map(1)
+        pass

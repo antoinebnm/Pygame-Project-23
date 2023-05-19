@@ -5,13 +5,6 @@ from game import *
 
 game = Game()
 
-
-class Color():
-    blank = '\033[0m'
-    red = '\033[31m'
-    green = '\033[92m'
-
-
 print(Color.green + """
                         .@ 
                       .@@@

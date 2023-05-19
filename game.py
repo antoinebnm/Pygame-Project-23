@@ -2,7 +2,7 @@ from sprites import *
 from fight import *
 from button import *
 
-#button images
+# Button images
 newg_img = pygame.image.load(img_path + 'new-game_btn.png').convert_alpha()
 load_img = pygame.image.load(img_path + 'load_btn.png').convert_alpha()
 option_img = pygame.image.load(img_path + 'settings_btn.png').convert_alpha()
@@ -14,13 +14,12 @@ class Game:
     def __init__(self):
         # Initialize Pygame and game objects
         pygame.init()
-        
+
         window.fill(pygame.Color(0,0,0)) # Add load screen
         self.text_box = pygame.rect.Rect((0,0),(screen.size))
         self.menu = False
         self.playing = False
         self.running = True
-        self.COUNTER = 0
         self.init_game = False
         self.fighting = False
 
@@ -29,10 +28,13 @@ class Game:
         self.load_button = Button(SCREEN_WIDTH // 2, (SCREEN_HEIGHT // 2) + self.ind*0.5, load_img, 0.6)
         self.option_button = Button(SCREEN_WIDTH // 2, (SCREEN_HEIGHT // 2) + self.ind*1, option_img, 0.6)
         self.exit_button = Button(SCREEN_WIDTH // 2, (SCREEN_HEIGHT // 2) + self.ind*1.5, exit_img, 0.6)
+        self.rect_return = Button(301,207,pygame.Rect(301,207,550,60))
+        self.rect_quit = Button(301,351,pygame.Rect(301,351,550,60))
+        self.rect_settings = Button(301,380,pygame.Rect(301,280,263,60))
+        self.rect_stats = Button(588,280,pygame.Rect(588,280,263,60))
 
 ### Fonction initialisation d'une nouvelle partie
     def new_game(self):
-        self.atker = "warrior"
         self.ind = 0
 
     # Reset datas
@@ -49,6 +51,7 @@ class Game:
 
     # Handle user input events
     def events(self):
+        global mouse_coord
         keys = pygame.key.get_pressed()
         mouse_coord = pygame.mouse.get_pos()
         
@@ -81,14 +84,6 @@ class Game:
 
                 pygame.display.flip()
 
-        if keys[pygame.K_RETURN]:
-            self.ind +=1
-            print(player_group)
-            if self.ind >= len(player_group):
-                self.ind = 0
-            self.atker = player_group[self.ind]
-            time.sleep(1)
-
         if not self.menu:
             menubg = False
             if keys[pygame.K_ESCAPE]:
@@ -99,27 +94,28 @@ class Game:
                     window.blit(menu_bg,window.get_rect())
 
         if self.menu:
-            if keys[pygame.K_SPACE]:
+            if self.rect_return.check():
                 self.menu = False
                 self.player.tiles.scroll_map(0)
                 self.update()
+            elif self.rect_quit.check():
+                self.running = False
+                pygame.quit()
+                raise SystemExit
 
 
     # Update the game state based on user input and object behavior
     def update(self):
-        
         if self.playing:
-            self.COUNTER += 1
-            self.player.update(self.COUNTER)
+            #COUNTER : round(pygame.time.get_ticks()/1000, 2)
+            #self.player.tiles.scroll_map(1)
+            self.player.update()
             ui_update()
-
-            for atk in player_group:
-                if self.atker == atk:
-                    text_write(350,int((ui_rect.height//15) * 12),str(atk.char_name))
 
 
     # Main game loop
     def run(self):
+        global mouse_coord
         if not self.playing:
             self.events()
             window.fill(COLOR_MENU)
@@ -151,8 +147,7 @@ class Game:
                 
 
 #        if DEBUG:
-        coords = pygame.mouse.get_pos()
-        pygame.display.set_caption(f"Mouse Coords: x:{coords[0]} | y:{coords[1]}")
+        pygame.display.set_caption(f"Mouse Coords: x:{mouse_coord[0]} | y:{mouse_coord[1]}")
 
         # Update display and tick clock
         clock.tick(FPS)

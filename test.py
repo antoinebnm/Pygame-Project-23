@@ -1,4 +1,5 @@
 import time, sys
+from config import *
 
 """Time = []
 Time.append(time.time())
@@ -9,7 +10,7 @@ print(Time[1])"""
 
 #print("Version: "+'.'.join([str(x) for x in sys.version_info if x in [3,11]]))
 
-from concurrent.futures import ThreadPoolExecutor
+"""from concurrent.futures import ThreadPoolExecutor
 
 def run_io_tasks_in_parallel(tasks):
     with ThreadPoolExecutor(max_workers=8) as executor:
@@ -95,3 +96,4 @@ if __name__ == '__main__':
             future_event.result()
             future_update.result()
             process_core.get()
+"""

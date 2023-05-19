@@ -1,5 +1,6 @@
 import pygame, random, sys, math, random, time, csv, os, json, threading
 
+
 #from pygame.locals import *
 
 PATH = os.path.dirname(__file__)
@@ -38,7 +39,7 @@ else:
 screen = pygame.rect.Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
 
 
-icon = pygame.image.load(img_path + 'elve_char.png')
+icon = pygame.image.load(img_path + 'icon.png')
 pygame.display.set_icon(icon)
 
 # font
@@ -50,12 +51,12 @@ clock = pygame.time.Clock()
 
 ###################################################################
 #                                                                 #
-#                     Thread Parallel Tasks                       #
+#                   Thread simultaneously Tasks                   #
 #                                                                 #
 ###################################################################
 from concurrent.futures import ThreadPoolExecutor
 
-def run_io_tasks_in_parallel(tasks):
+def run_io_tasks_in_simultaneously(tasks):
     with ThreadPoolExecutor() as executor:
         running_tasks = [executor.submit(task) for task in tasks]
         for running_task in running_tasks:
@@ -66,9 +67,7 @@ def run_io_tasks_in_parallel(tasks):
         
         executor.shutdown()
 """
-print(ThreadPoolExecutor()._max_workers)
-
-run_io_tasks_in_parallel([
+run_io_tasks_in_simultaneously([
     lambda: funcA(),
     lambda: funcB(),
 ])
@@ -79,8 +78,20 @@ run_io_tasks_in_parallel([
 #                             Colors                              #
 #                                                                 #
 ###################################################################
+class Color():
+    blank = '\u001b[0m'
+    black = '\u001b[30m'
+    red = '\u001b[31m'
+    green = '\u001b[32m'
+    yellow = '\u001b[33m'
+    blue = '\u001b[34m'
+    magenta = '\u001b[35m'
+    cyan = '\u001b[36m'
+
+# PYGAME COLORS
 COLOR_UI = pygame.color.Color(20, 23, 37)
 COLOR_WHITE = pygame.color.Color(255,255,255)
+COLOR_BLACK = pygame.color.Color(0,0,0)
 COLOR_MENU = pygame.color.Color(20,160,130)
 
 
