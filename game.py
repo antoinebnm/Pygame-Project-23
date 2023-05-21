@@ -15,6 +15,10 @@ option_img = pygame.image.load(img_path + 'settings_btn.png').convert_alpha()
 exit_img = pygame.image.load(img_path + 'exit_btn.png').convert_alpha()
 menu_img = pygame.image.load((img_path + 'mc_pausescreen' + '.png')).convert_alpha()
 
+# Monsters Images
+ogre = pygame.image.load((sprite_path + 'Ogre' + '.png')).convert_alpha()
+dragon = pygame.image.load((sprite_path + 'Dragon' + '.png')).convert_alpha()
+
 
 ###################################################################
 #                                                                 #
@@ -127,6 +131,14 @@ class Game:
     def update(self):
         if self.playing:
             self.player.update()
+
+            for i,monster in enumerate(Waves[FightSyst.wave_num]):
+                if monster.is_alive:
+                    if monster == Ogre:
+                        exec(f'window.blit({(monster.char_name).lower()},(screen.right - 120 - ({i}*30), self.player.tiles.ground - 18))')
+                    else:
+                        exec(f'window.blit({(monster.char_name).lower()},(screen.right - 160 - ({i}*30), self.player.tiles.ground - 30))')
+            
             ui_update()
 
 
