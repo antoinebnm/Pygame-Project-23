@@ -274,6 +274,7 @@ Turn : {turn}""")
                                     if a == 0:
                                         text_write(40, 40,"No ally is healable.",placement='console')
                                     else:
+                                        self.EVENT = 'heal'
                                         while ally == None and self.EVENT == 'heal':
                                             text_write(40, 40,"Wanna heal which ally ?",placement='console')
                                             self.EVENT = 'heal'
@@ -303,6 +304,7 @@ Turn : {turn}""")
                                         text_write(40, 40,"No ally is revivable.",placement='console')
                                     else:
                                         if atk_list[index].cooldown == 0:
+                                            self.EVENT = 'revive'
                                             while ally == None and self.EVENT == 'revive':
                                                 text_write(40, 40,"Wanna revive wich ally ?",placement='console')
                                                 self.EVENT = 'revive'
@@ -589,8 +591,7 @@ Turn : {turn}""")
                 if action == 2:
                     target.Damage = int(target.Damage * 0.8)
                 elif action == 3:
-                    target.Armor *= 1.2
-                    target.Armor = round(target.Armor,2)
+                    target.Armor = round(target.Armor * 1.2,2)
             
                 print(f"{attacker.char_name} used {'Weakening Spell' if action == 2 else 'Growing Roots'}.")
                 print(f"{attacker.char_name} {f'has weakened {target.char_name}' if action == 2 else f'has reduced {target.char_name} Armor by {str(20)}%.'}.")
@@ -608,10 +609,10 @@ Turn : {turn}""")
 
         elif action == 4:
             print(f'{attacker.char_name} will block some of the damage recieved during this turn.')
-            attacker.Armor *= 1.3
-            attacker.Armor = round(attacker.Armor,2)
+            attacker.Armor = round(attacker.Armor * 0.7 ,2)
             print(f'{attacker.char_name} Armor is now for this turn at {int(attacker.Armor * 100)}%.')
-
+    
+    # Admin command
         elif action == 8:
             print(f'Insta killed {target.char_name}')
             target.Health -= target.Health
@@ -707,7 +708,10 @@ def player_interact():
                             EVENT = 'target'
                             time.sleep(0.2)
             
-                        ind = player_group.index(atk_list[index])
+                        try:
+                            ind = player_group.index(atk_list[index])
+                        except:
+                            pass
 
                         for j,atk in enumerate(HEROES_ACTIONS_BUFFS.keys()):
                             if (j % 5) == (ind+1) or (atk) == 'Defense':
