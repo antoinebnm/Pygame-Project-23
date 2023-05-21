@@ -1,3 +1,9 @@
+###################################################################
+#                                                                 #
+#                  Imports and images loading                     #
+#                                                                 #
+###################################################################
+
 from sprites import *
 from fight import *
 from button import *
@@ -10,19 +16,26 @@ exit_img = pygame.image.load(img_path + 'exit_btn.png').convert_alpha()
 menu_img = pygame.image.load((img_path + 'mc_pausescreen' + '.png')).convert_alpha()
 
 
-class Game:
+###################################################################
+#                                                                 #
+#                         Main Game Class                         #
+#                                                                 #
+###################################################################
+# Screen And User Interface Management
+class Game: 
     def __init__(self):
         # Initialize Pygame and game objects
         pygame.init()
 
-        window.fill(pygame.Color(0,0,0)) # Add load screen
-        self.text_box = pygame.rect.Rect((0,0),(screen.size))
+    # Class Variables
+        window.fill(pygame.Color(0,0,0)) # Add a load screen maybe ?
         self.menu = False
         self.playing = False
         self.running = True
         self.init_game = False
         self.fighting = False
 
+    # Buttons for UI
         self.ind = newg_img.get_height() + 20
         self.newg_button = Button(SCREEN_WIDTH // 2, (SCREEN_HEIGHT // 2) + self.ind*0, newg_img, 0.6)
         self.load_button = Button(SCREEN_WIDTH // 2, (SCREEN_HEIGHT // 2) + self.ind*0.5, load_img, 0.6)
@@ -33,7 +46,7 @@ class Game:
         self.rect_settings = Button(301,380,pygame.Rect(301,280,263,60))
         self.rect_stats = Button(588,280,pygame.Rect(588,280,263,60))
 
-### Fonction initialisation d'une nouvelle partie
+### New game init function
     def new_game(self):
         self.ind = 0
 
@@ -41,7 +54,7 @@ class Game:
         """ To do """
         FightSyst.wave_num = 0
         self.playing = True
-    #Call Player class in Sprites
+    #Call Player class in Sprites (print and manage sprites + map)
         self.player = Sprite(1)
     # Init screen
         window.fill(COLOR_UI)
@@ -49,7 +62,11 @@ class Game:
         ui_update()
 
 
-    # Handle user input events
+    ###################################################################
+    #                                                                 #
+    #                        Events Management                        #
+    #                                                                 #
+    ###################################################################
     def events(self):
         global mouse_coord
         keys = pygame.key.get_pressed()
@@ -62,8 +79,7 @@ class Game:
                 raise SystemExit
 
             elif event.type == pygame.VIDEORESIZE:
-                screen = pygame.display.set_mode(
-                event.dict['size'], pygame.HWSURFACE | pygame.DOUBLEBUF | pygame.RESIZABLE)
+                screen = pygame.display.set_mode(event.dict['size'], pygame.HWSURFACE | pygame.DOUBLEBUF | pygame.RESIZABLE)
                 
                 if self.playing and not self.menu:
                     image = self.player.tiles.image
@@ -96,26 +112,32 @@ class Game:
         if self.menu:
             if self.rect_return.check():
                 self.menu = False
-                self.player.tiles.scroll_map(0)
+                self.player.tiles.update()
                 self.update()
             elif self.rect_quit.check():
                 self.running = False
                 pygame.quit()
                 raise SystemExit
+            if keys[pygame.K_k]:
+                for x in player_group:
+                    x.is_alive = False
 
 
     # Update the game state based on user input and object behavior
     def update(self):
         if self.playing:
-            #COUNTER : round(pygame.time.get_ticks()/1000, 2)
-            #self.player.tiles.scroll_map(1)
             self.player.update()
             ui_update()
 
 
-    # Main game loop
+    ###################################################################
+    #                                                                 #
+    #                          Main Game Loop                         #
+    #                                                                 #
+    ###################################################################
     def run(self):
         global mouse_coord
+    # IF for Introduction Screen Menu
         if not self.playing:
             self.events()
             window.fill(COLOR_MENU)
@@ -129,25 +151,35 @@ class Game:
             elif self.exit_button.check():
                 self.running = False
                 pass
-
+    
+    # IF for game init
         if self.init_game:
             self.new_game()
             self.init_game = False
 
+    # IF for the game loop, with events and screen update management
         if self.playing:
             self.events()
             self.update() if not self.menu else None
-            if not self.fighting:
-                if FightSyst.wave_num in range(len(Waves)):
+
+        # Threading of the Fight Core, dual task in parallel
+            if not FightSyst.ThreadLaunched:
+                if FightSyst.wave_num in range(len(Waves)) and not FightSyst.fighting and not FightSyst.gameover:
+                    # Daemon = True : so Thread closes when main pygame loop stops
                     fight_thread = threading.Thread(target=FightSyst.main, daemon=True, args=[FightSyst.wave_num], name="FightSystem")
                 else:
-                    fight_thread = threading.Thread(target=FightSyst.end_game, daemon=True, name="FightSystem")
+                    fight_thread = threading.Thread(target=FightSyst.end_game, daemon=True, name="FightEnd")
+
                 fight_thread.start()
-                self.fighting = True
+                FightSyst.ThreadLaunched = True
+                
+                if fight_thread.name == 'FightEnd':
+                    self.playing = False
+            
                 
 
-#        if DEBUG:
-        pygame.display.set_caption(f"Mouse Coords: x:{mouse_coord[0]} | y:{mouse_coord[1]}")
+        if DEBUG:
+            pygame.display.set_caption(f"Mouse Coords: x:{mouse_coord[0]} | y:{mouse_coord[1]}")
 
         # Update display and tick clock
         clock.tick(FPS)

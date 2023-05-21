@@ -3,7 +3,7 @@ from button import *
 
 ################################################################
 #                                                              #
-#       Classe Charactère, définition des statistiques         #
+#               Character Class / Statistics init              #
 #                                                              #
 ################################################################
 
@@ -29,7 +29,7 @@ class Character():
         self.Damage = damage
         self.BaseDamage = damage
 
-        self.Armor = armor # armor = resistance ==> 'health -= damage * armor' (scale from 0 to 1)
+        self.Armor = armor # Armure = coeficient multiplicateur ==> ~0 --> très résistant / ~1 --> peu résistant
         self.BaseArmor = armor
 
         self.Ammo = ammo # For the archer
@@ -38,14 +38,15 @@ class Character():
 
 ################################################################
 #                                                              #
-#          Classe principale : Système de combat               #
+#                Main Class : Fight System Core                #
 #                                                              #
 ################################################################
 
 class Fight():
     def __init__(self):
-        global showattackers
-        showattackers = False
+        self.gameover = False
+        self.fighting = False
+        self.ThreadLaunched = False
 
         self.EVENT = ''
     # Reset or not if no saves
@@ -54,6 +55,11 @@ class Fight():
         else:
             self.reset_vars()
     
+    ###################################################################
+    #                                                                 #
+    #            Main Fight Loop --> Calls the other functions        #
+    #                                                                 #
+    ###################################################################
     def main(self, wave):
         self.wave_num = wave
         if wave in range(len(Waves)):
@@ -64,8 +70,9 @@ class Fight():
 
             # Si chasseur en vie, refill des 5 flèches en début de manche
             for hero in player_group:
-                if (hero == Chasseur) and (hero.is_alive):
+                if (hero == Chasseur):
                     hero.Ammo = hero.MaxAmmo
+                hero.cooldown = 0
 
             self.win_team = self.fight_syst(wave)
             if not self.fighting:
@@ -73,7 +80,11 @@ class Fight():
                 self.fight_end(self.win_team)
 
 
-# - Système de sauvegarde
+###################################################################
+#                                                                 #
+#                             SAVE SYSTEM                         #
+#                                                                 #
+###################################################################
 
     def load_vars(self):
     # Load variables on a json file
@@ -85,10 +96,22 @@ class Fight():
 
     def end_game(self):
     # Écran End Game (pygame)
-        pass
+        window.fill(pygame.color.Color(0,0,0,60),window.get_rect())
+
+        self.gameover = True
+        self.fighting = False
+
+    # Affichage buggé, mise en commentaire
+        """if not (self.wave_num > len(Waves)):
+            window.blit(pygame.transform.scale(end_frame,window.get_size()),(0,0))"""
 # -
 
 
+###################################################################
+#                                                                 #
+#                       TO DELETE / USELESS                       #
+#                                                                 #
+###################################################################
     def ui(self,wave,turn,atk): # / adapt to pygame /!\
         self.is_alive(wave, False)
 
@@ -142,12 +165,18 @@ Turn : {turn}""")
                     print(f'{i+1}. {monster.char_name} (ID:{monster.id})')
                 else:
                     print(f'{i+1}. {monster.char_name} (ID:{monster.id}) DEAD')
+# -
 
-# Fight system management
+
+
+###################################################################
+#                                                                 #
+#                    Fighting system management                   #
+#                                                                 #
+###################################################################
     def fight_syst(self,wave):
-        global action, target, turn, atk_list, index, showattackers, wave_num
+        global action, target, ally, turn, atk_list, index, wave_num
         wave_num = wave
-        showattackers = False
 
         turn = 0
         index = -1
@@ -157,7 +186,7 @@ Turn : {turn}""")
             self.wave_ended = False
             print("–––––––––––––––––––––––––––––––––––––")
             print("\nStart of the wave number",str(wave+1))
-            text_write(300, 80, ("Start of the wave number" + str(wave+1)))
+            text_write(40, 40, ("Start of the wave number" + str(wave+1)),placement='console')
             print("Alive Allies are :",", ".join([str(x.char_name) for x in (player_group) if (x.is_alive == True)]))
             print("\nEnemies are :",", ".join([str(y.char_name) + ' ID:' + str(y.id) for y in monster_group[wave]]))
             print("–––––––––––––––––––––––––––––––––––––")
@@ -167,8 +196,6 @@ Turn : {turn}""")
             turn += 1
             index += 1
             atk_list = self.get_turn(wave) # get_turn() donne l'ordre d'attaque des personnages
-            if not showattackers:
-                showattackers = True
 
         # Manage index of turn list
             self.check = False
@@ -183,7 +210,7 @@ Turn : {turn}""")
                     self.check = True
             
                 
-        # Global vars
+        # Global variables
             target = None
             ally = None
             action = None
@@ -196,15 +223,12 @@ Turn : {turn}""")
 
             if (atk_list[index] != None) and (atk_list[index] in player_group):
                 while security:
-                    self.EVENT = 'action'
                     while action == None:
-                        pass
-                    #action = input("\n>>> Choose your move :\n ")
+                        self.EVENT = 'action'
                     try :
                         action = int(action)
                     except ValueError:
-                        self.EVENT = 'invalid action'
-                        #print('\n>>> Invalid action, please try again.')
+                        text_write(40, 40,'>>> Invalid action, please try again.',placement='console')
                     except TypeError:
                         pass
                     else:
@@ -212,80 +236,104 @@ Turn : {turn}""")
                             if (atk_list[index] == Guerrier) or ((atk_list[index] == Chasseur) and atk_list[index].Ammo > 0):
                                 if action == 2:
                                     while target == None:
+                                        text_write(40, 40,'Wanna attack which ennemy ?',placement='console')
                                         self.EVENT = 'target'
-                                    #target = input("Wanna attack which ennemy ?\n ")
                                 elif action == 3:
                                     if atk_list[index].cooldown == 0:
                                         while target == None:
+                                            text_write(40, 40,"Wanna attack which ennemy ?",placement='console')
                                             self.EVENT = 'target'
-                                        #target = input("Wanna attack which ennemy ?\n ")
                                     else:
                                         target= None
+                                        action = None
                                         self.EVENT = 'cooldown'
-                                        #print(f'This attack is on cooldown for {atk_list[index].cooldown} turns.')
+                                        text_write(40, 40,(f'This attack is on cooldown for {atk_list[index].cooldown} turns.'))
+                                        pass
 
                             elif atk_list[index] == Chasseur and atk_list[index].Ammo <=0:
                                 target= None
                                 self.EVENT = 'no arrows'
-                                #print('You have no more arrows for this wave.')
+                                text_write(40, 40,'You have no more arrows for this wave.',placement='console')
 
                             elif atk_list[index] == Guerisseur:
-                                print("Allies Healable :")
+                                # Shell Printing
+                                """print("Allies Healable :")
                                 for j,x in enumerate(player_group):
                                     if (x.is_alive and (x.Health < x.MaxHealth)):
                                         print(f"{j}. {x.char_name} ({x.Health} => {int(x.Health + (x.MaxHealth * 0.2)) if int(x.Health + (x.MaxHealth * 0.2)) <= x.MaxHealth else f'{x.MaxHealth}'})")
                                 print("Allies Resurrectable :")
                                 for j,x in enumerate(player_group):
                                     if not x.is_alive:
-                                        print(f"{j}. {x.char_name} ({int(x.MaxHealth * 0.4)})")
+                                        print(f"{j}. {x.char_name} ({int(x.MaxHealth * 0.4)})")"""
                                 if action == 2:
-                                    self.EVENT = 'heal'
-                                    ally = int(input("Wanna heal which ally ?\n "))
-                                    try:
-                                        ally = int(ally)
-                                        player_group[ally].is_alive
-                                    except ValueError:
-                                        self.EVENT = 'invalid target'
-                                        #print('\n>>> Invalid target, please try again.')
-                                    except IndexError:
-                                        ally = None
-                                        target = None
-
-                                    if not ally in range(0,len(player_group)) and player_group[ally].is_alive:
-                                        target = None
-                                        self.EVENT = 'ally target'
-                                        #print('Target must be an alive ally.')
-                                elif action == 3:
-                                    if atk_list[index].cooldown == 0:
-                                        self.EVENT = 'revive'
-                                        ally = int(input("Wanna revive wich ally ?\n "))
+                                    a = 0
+                                    for x in player_group:
+                                        if (x.Health < x.MaxHealth):
+                                            a += 1
+                                        
+                                    if a == 0:
+                                        text_write(40, 40,"No ally is healable.",placement='console')
+                                    else:
+                                        while ally == None and self.EVENT == 'heal':
+                                            text_write(40, 40,"Wanna heal which ally ?",placement='console')
+                                            self.EVENT = 'heal'
                                         try:
+                                            ally = int(ally)
                                             player_group[ally].is_alive
+                                        except ValueError:
+                                            ally = None
+                                            target = None
+                                            text_write(40, 40,'>>> Invalid target, please try again.',placement='console')
                                         except IndexError:
                                             ally = None
                                             target = None
-                                            
-                                        if not ally in range(0,len(player_group)) and not player_group[ally].is_alive:
-                                            target = None
-                                            self.EVENT = 'dead ally'
-                                            #print('Target must be a dead ally.')
+                                        except TypeError:
+                                            pass
+                                        else:
+                                            if not ally in range(0,len(player_group)) and player_group[ally].is_alive:
+                                                target = None
+                                                text_write(40, 40,'Target must be an alive ally.',placement='console')
+                                elif action == 3:
+                                    a = 0
+                                    for x in player_group:
+                                        if not x.is_alive:
+                                            a += 1
+                                        
+                                    if a == 0:
+                                        text_write(40, 40,"No ally is revivable.",placement='console')
                                     else:
-                                        target= None
-                                        self.EVENT = 'cooldown'
-                                        #print(f'This attack is on cooldown for {atk_list[index].cooldown} turns.')
+                                        if atk_list[index].cooldown == 0:
+                                            while ally == None and self.EVENT == 'revive':
+                                                text_write(40, 40,"Wanna revive wich ally ?",placement='console')
+                                                self.EVENT = 'revive'
+                                            try:
+                                                player_group[ally].is_alive
+                                            except IndexError:
+                                                ally = None
+                                                target = None
+                                            else:
+                                                if not ally in range(0,len(player_group)) and not player_group[ally].is_alive:
+                                                    target = None
+                                                    self.EVENT = 'dead ally'
+                                                    text_write(40, 40,'Target must be a dead ally.',placement='console')
+                                        else:
+                                            target= None
+                                            self.EVENT = 'cooldown'
+                                            text_write(40, 40,f'This attack is on cooldown for {atk_list[index].cooldown} turns.',placement='console')
 
                             elif atk_list[index] == Mage:
                                 while target == None:
+                                    text_write(40, 40,"Wanna attack which ennemy ?",placement='console')
                                     self.EVENT = 'target'
-                                #target = input("Wanna attack which ennemy ?\n ")
         
                         elif action in [1,8]:
                             while target == None:
+                                text_write(40, 40,"Wanna attack which ennemy ?",placement='console')
                                 self.EVENT = 'target'
-                            #target = input("Wanna attack which ennemy ?\n ")
                         elif action == 4:
                             self.EVENT = 'defense'
-                            #print("You'll block some of the next damage you'll receive next attack (this turn only)")
+                            text_write(40, 40,"You'll block some of the next damage",placement='console')
+                            text_write(40,60,"you'll receive next attack (this turn only)",placement='console')
                             target = 0
                         elif action == 0:
                             target = 0
@@ -300,27 +348,23 @@ Turn : {turn}""")
                             for x in player_group:
                                 x.Health = x.MaxHealth
                                 x.is_alive = True
-                            print('All heroes have been healed / revived.')
+                            print('All heroes have been healed / revived.',placement='console')
                         else: 
-                            self.EVENT = 'invalid action'
-                            #print('\n>>> Invalid action, please try again.')
+                            text_write(40, 40,'>>> Invalid action, please try again.',placement='console')
                             action = None; target = None
 
                         try:
                             self.EVENT = ''
                             target = int(target)
                         except:
-                            self.EVENT = 'invalid target'
-                            #print('\n>>> Invalid target, please try again.')
+                            text_write(40, 40,'>>> Invalid target, please try again.',placement='console')
                         else:
                             if (action not in [0,9]) and not (target in range(0, len(Waves[wave]) + 1)):
-                                self.EVENT = 'invalid target'
-                                #print('\n>>> Target isn\'t valid! Choose another target.')
+                                text_write(40, 40,'>>> Target isn\'t valid! Choose another target.',placement='console')
                             
                             if ((target == 0) and not (action in [0,4,9]) and ally == None):
                                 target = None
-                                self.EVENT = 'invalid target'
-                                #print('\n>>> Target can\'t be yourself!')
+                                text_write(40, 40,'>>> Target can\'t be yourself!',placement='console')
                     
                     if (action in [1,2,3,4,8]) and ((target in range(0, len(Waves[wave]) + 1)) or ally != None):
                         security = False
@@ -331,10 +375,10 @@ Turn : {turn}""")
                         elif not Waves[wave][target - 1].is_alive:
                             target = None
                             security = True
-                            self.EVENT = 'invalid target'
-                            #print('\n>>> Target\'s already dead! Choose another target.')
+                            text_write(40, 40,'>>> Target\'s already dead! Choose another target.',placement='console')
 
                     # ---- End of while loop ----
+
 
                 if ally == None:
                     i = target -1 # Index target -1 pour faciliter dans la suite du programme
@@ -353,15 +397,17 @@ Turn : {turn}""")
         # Si c'est au tour du monstre d'attaquer, alors :
             elif atk_list[index] in Waves[wave]:
             # init monster action and target with ui() function
-                target,action = self.ai()
+                target,action = self.ai(wave)
                 print(f'{atk_list[index].char_name} has attacked')
                 print(f'Target of the {atk_list[index].char_name} is', target.char_name)
+
 
         # Manage the fight between attacker and target
             if ally == None:
                 self.manage_fight(atk_list[index],target,action)
             else:
                 self.manage_fight(atk_list[index],ally,action)
+
 
         # ---- Check for any dead team ----
             self.is_alive(wave, False)
@@ -390,6 +436,12 @@ Turn : {turn}""")
         return win_team
     # ---- Going back to the for Game loop (last lines of the pgrgm) ----
 
+
+###################################################################
+#                                                                 #
+#                "Character IS ALIVE?" Function                   #
+#                                                                 #
+###################################################################
     def is_alive(self,wave,out=False):
         for character in player_group:
             if character.Health <= 0:
@@ -402,23 +454,33 @@ Turn : {turn}""")
                 character.is_alive = False
             if DEBUG and out: print(f'check alive monster {character.char_name}{character.id}: {character.is_alive}')
 
+
+# End Screen / Victory & Game Over
     def fight_end(self,win_team):
         self.fighting = False
-        print('\n-\nVague terminée\n-')
+        self.ThreadLaunched = False
+        self.wave_num += 1
+        #print('\n-\nVague terminée\n-')
         if win_team == 'monsters':
             print('Game lost')
             self.end_game()
         else:
             print('Victory')
-        print(f'The {win_team} has won.')
-        time.sleep(2)
-        
+            if self.wave_num >= len(Waves):
+                self.end_game()
+        #print(f'The {win_team} has won.')
+
 # AI of the monsters
-    def ai(self):
+    def ai(self,wave):
     # Range of random actions of the monster
+        self.is_alive(wave)
         action = random.randint(1,1)
     # Range of the random target of the monsters
-        target = random.choice([x for x in player_group if x.is_alive == True])
+        try:
+            target = random.choice([x for x in player_group if x.is_alive == True])
+        except: 
+            target = None
+            self.fight_end('monsters')
         return target, action
 
 # System for turn by turn gameplay
@@ -509,6 +571,7 @@ Turn : {turn}""")
                 if action == 2:
                     ally = target
                     heal = int(ally.Health + (ally.MaxHealth * 0.2))
+                    oldhealth = ally.Health
                     ally.Health = heal
                     if ally.Health > ally.MaxHealth:
                         ally.Health = ally.MaxHealth
@@ -516,10 +579,11 @@ Turn : {turn}""")
                     ally = target
                     heal = int(ally.MaxHealth * 0.4)
                     ally.is_alive = True
+                    oldhealth = ally.Health
                     ally.Health = heal
 
                 print(f"{attacker.char_name} used {'Heal' if action == 2 else 'Revive'}.")
-                print(f"{attacker.char_name} {f'is healing {ally.char_name} by {heal} HP' if action == 2 else f'is reviving {ally.char_name} from the deads'}.")
+                print(f"{attacker.char_name} {f'is healing {ally.char_name} by {heal - oldhealth} HP' if action == 2 else f'is reviving {ally.char_name} from the deads'}.")
                 
             elif attacker == Mage:
                 if action == 2:
@@ -561,66 +625,66 @@ Turn : {turn}""")
 
 ################################################################
 #                                                              #
-#       Code exécuté dans la boucle de jeu principale          #
+#       Easy accessed Functions / Screen text printing         #
 #                                                              #
 ################################################################
 
-def text_write(x, y, text='default text', center="topleft" , color=COLOR_WHITE, scale=1):
+def text_write(x, y, text='default text', center="topleft" , placement='ui', color=COLOR_WHITE, scale=1):
     scale = float(scale)
     text = font.render(text, False, color).convert_alpha()
     text = pygame.transform.scale_by(text,scale)
     text_rect = text.get_rect()
-    y += SCREEN_HEIGHT # adjust to bottom of screen / ui
+    if placement == 'ui':
+        y += SCREEN_HEIGHT # adjust to bottom of screen / ui
+    elif placement == 'console':
+        x += console.left
     exec(f'text_rect.{center} = (({x}),({y}))')
     window.blit(text, text_rect)
     return text_rect
 
 def ui_update():
-    global action, target, turn, atk_list, index
-    global EVENT, mouse_coord, showattackers
+    global action, target, ally, turn, atk_list, index
+    global EVENT, mouse_coord
 
     mouse_coord = pygame.mouse.get_pos()
+    EVENT = FightSyst.EVENT
 
     window.fill(COLOR_UI,ui_rect)
-    EVENT = FightSyst.EVENT
+    window.blit(pygame.transform.scale(lineV_img,(lineV_img.get_width(),window.get_height())),(console.topleft))
+    window.blit(pygame.transform.scale(lineH_img,(console.w,lineH_img.get_height())),(console.bottomleft))
+    if clock.get_time()> 23:
+        window.fill(COLOR_UI,console)
 
 # UI indicator
     char_text = []
     for i,char in enumerate(player_group):
-        char_text.append(text_write(30, int((ui_rect.height//12))+ (i* 30),str(char.char_name)))
-        
+        char_text.append(text_write(40, int((ui_rect.height//12))+ (i* 40),str(char.char_name)))
+
         if char_text[i].collidepoint(mouse_coord):
-            window.blit(frame, (300,450))
+            window.blit(frame, (220,450))
             for x,stat in enumerate(stats_icons):
                 if (stat != ammo_icon) or (char == Chasseur):
-                    window.blit(stat, (320, int(screen.bottom + 16 + (x*32))))
-                    text_write(360, int((ui_rect.height//16) * 1), f'{char.Health}')
-                    text_write(360, int((ui_rect.height//16) * 3), f'{char.Damage}')
-                    text_write(360, int((ui_rect.height//16) * 5), f'{char.Armor}')
+                    window.blit(stat, (240, int(screen.bottom + 16 + (x*32))))
+                    text_write(280, int((ui_rect.height//16) * 1), f'{char.Health} / {char.MaxHealth}')
+                    text_write(280, int((ui_rect.height//16) * 3), f'{char.Damage}')
+                    text_write(280, int((ui_rect.height//16) * 5), f'{char.Armor}')
                     if char == Chasseur:
-                        text_write(360, int((ui_rect.height//16) * 7), f'{char.Ammo}')
-    
-    current = text_write(30,int((ui_rect.height//16) * 12), 'Current Attacker :')
-    next = text_write(30,int((ui_rect.height//16) * 13), 'Next Attacker :')
-    if showattackers:
-        text_write(current.right + 10,int((ui_rect.height//16) * 12),str(atk_list[0].char_name))
-        text_write(next.right + 10,int((ui_rect.height//16) * 13),str(atk_list[1].char_name))
-
+                        text_write(280, int((ui_rect.height//16) * 7), f'{char.Ammo}')
     try:
         EVENT = str(EVENT).lower()
     except:
         pass
     else:
         if EVENT == 'action':
-            text_write(600, int((ui_rect.height//15) * 2), 'Choose your move :')
+            text_write(660, int((ui_rect.height//15)), 'Choose your move :')
         elif EVENT == 'target':
-            text_write(600, int((ui_rect.height//15) * 2), 'Choose your target :')
+            text_write(660, int((ui_rect.height//15)), 'Choose your target :')
         
         player_interact()
 
         
 def player_interact():
-    global action, target, turn, atk_list, index, wave_num
+    global action, target, ally, turn, atk_list, index, wave_num
     global EVENT, mouse_coord
 
     try:
@@ -641,6 +705,7 @@ def player_interact():
                         if act.check():
                             action = i+1
                             EVENT = 'target'
+                            time.sleep(0.2)
             
                         ind = player_group.index(atk_list[index])
 
@@ -655,14 +720,48 @@ def player_interact():
         
         elif EVENT == 'target':
             for i,targetable in enumerate(Waves[wave_num]):
-                i +=1
-                k = text_write(600,int((ui_rect.height//15) * ((i)*4)),(f'{i}: ' + targetable.char_name + ' ID:' + str(targetable.id)),color=COLOR_WHITE)
+                i += 1
+                k = text_write(600,int((ui_rect.height//15) * ((i)*4)),(f'{i}: ' + targetable.char_name + (' DEAD' if not targetable.is_alive else '')),color=COLOR_WHITE)
                 if Button(k.left,k.top,pygame.rect.Rect(k.left,k.top,k.w,k.h)).check():
                     target = Waves[wave_num].index(targetable) + 1
-                    print(target)
                     EVENT = ''
+                    time.sleep(0.2)
+
+    # Healer Actions
+        elif EVENT == 'heal':
+            for i,targetable in enumerate(player_group):
+                """return_text = text_write(500,int((ui_rect.height//15)),('- Retour -'),color=COLOR_WHITE)
+                if Button(return_text.left,return_text.top,pygame.rect.Rect(return_text.left,return_text.top,return_text.w,return_text.h)).check():
+                    ally = None
+                    action = None
+                    EVENT = 'action'"""
+
+                if targetable.is_alive and (targetable.Health < targetable.MaxHealth):
+                    i += 1
+                    k = text_write(600,int((ui_rect.height//15) * ((i)*4)),(f'{i}: ' + targetable.char_name + f' : {targetable.Health}->{int(targetable.Health + (targetable.MaxHealth * 0.2))}'),color=COLOR_WHITE)
+                    if Button(k.left,k.top,pygame.rect.Rect(k.left,k.top,k.w,k.h)).check():
+                        ally = player_group.index(targetable)
+                        EVENT = ''
+                        time.sleep(0.2)
+
+        elif EVENT == 'revive':
+            for i,targetable in enumerate(player_group):
+                """return_text = text_write(500,int((ui_rect.height//15)),('- Retour -'),color=COLOR_WHITE)
+                if Button(return_text.left,return_text.top,pygame.rect.Rect(return_text.left,return_text.top,return_text.w,return_text.h)).check():
+                    ally = None
+                    action = None
+                    EVENT = 'action'"""
+
+                if not targetable.is_alive:
+                    i += 1
+                    k = text_write(600,int((ui_rect.height//15) * ((i)*4)),(f'{i}: ' + targetable.char_name + f'est mort(e). : {targetable.Health} -> {int(targetable.MaxHealth * 0.4)}'),color=COLOR_WHITE)
+                    if Button(k.left,k.top,pygame.rect.Rect(k.left,k.top,k.w,k.h)).check():
+                        ally = player_group.index(targetable)
+                        EVENT = ''
+                        time.sleep(0.2)
 
 
+# Shell Printing of Teams Statistics (Heros + Enemies)
 def stats(team):
     print("–––––––––––––––––––––––––––––––––––––")
     for member in team:
@@ -675,20 +774,23 @@ def stats(team):
 
 ################################################################
 #                                                              #
-#         Variables et images pour le système combat           #
+#       Global Variables and images for Fight Core System      #
 #                                                              #
 ################################################################
 # IMPORTS
 
 ui_rect = pygame.rect.Rect(screen.left, screen.bottom, window.get_width(), LOWER_MARGIN)
 frame = pygame.image.load(img_path + 'frame.png').convert_alpha()
+lineV_img = pygame.image.load(img_path + 'lineV.png').convert_alpha()
+lineH_img = pygame.image.load(img_path + 'lineH.png').convert_alpha()
 action_frame = pygame.image.load(img_path + 'actions_frame.png').convert_alpha()
+end_frame = pygame.image.load(img_path + 'end_game.webp').convert_alpha()
 
 # Buttons
-act1 = Button(600,int((ui_rect.height//8) * 16), action_frame, 0.5)
-act2 = Button(864,int((ui_rect.height//8) * 16), action_frame, 0.5)
-act3 = Button(600,int((ui_rect.height//8) * 19), action_frame, 0.5)
-act4 = Button(864,int((ui_rect.height//8) * 19), action_frame, 0.5)
+act1 = Button(660,int((ui_rect.height//8) * 16), action_frame, 0.5)
+act2 = Button(924,int((ui_rect.height//8) * 16), action_frame, 0.5)
+act3 = Button(660,int((ui_rect.height//8) * 19), action_frame, 0.5)
+act4 = Button(924,int((ui_rect.height//8) * 19), action_frame, 0.5)
 actions_buttons = [act1,act2,act3,act4]
 
 # Stats images
@@ -700,41 +802,46 @@ stats_icons = []
 stats_icons.append([ a for i, a in locals().items() if str(i).endswith('_icon')])
 stats_icons = stats_icons[0]
 
-
-
 chararcter_stats = ['Health','Damage','Armor','Ammo','Speed']
 monster_group = []
 player_group = []
 
+
+
 ################################################################
-#   Définition des vagues d'enemies et de l'équipe héros       #
+#                                                              #
+#      Storage of Monster Waves and Heroes in Global List      #
+#                                                              #
+################################################################
 
 # Armure = coeficient multiplicateur ==> ~0 --> très résistant / ~1 --> peu résistant
 
-for char_name in PLAYER_CHARACTERS: # health, attack Speed, damage, armor + max ammo
-    if char_name == 'warrior':
-        Guerrier = Character(0,"hero","Guerrier",20,1,14,0.4)
+for key, value in PLAYER_CHARACTERS.items():
+    # Guerrier, Chasseur, Guerisseur, Mage
+    # Stats : [Health, Attack turn, Damage, Armor, Ammo]
+    if key == 'Guerrier':
+        Guerrier = Character(0, "hero", key, value[0], value[1], value[2], value[3], value[4])
         player_group.append(Guerrier)
-    elif char_name == 'elve':
-        Chasseur = Character(0,"hero","Chasseur",18,3,12,0.8,5)
+    elif key == 'Chasseur':
+        Chasseur = Character(0, "hero", key, value[0], value[1], value[2], value[3], value[4])
         player_group.append(Chasseur)
-    elif char_name == 'healer':
-        Guerisseur = Character(0,"hero","Guerisseur",16,5,8,1.1)
+    elif key == 'Guerisseur':
+        Guerisseur = Character(0, "hero", key, value[0], value[1], value[2], value[3], value[4])
         player_group.append(Guerisseur)
     else:
-        Mage = Character(0,"hero","Mage",16,4,14,0.9)
+        Mage = Character(0, "hero", key, value[0], value[1], value[2], value[3], value[4])
         player_group.append(Mage)
-
+    
 Enemies = ['Ogre', 'Dragon']
 Waves = [[Enemies[0]],
          [Enemies[0],Enemies[0]],
          [Enemies[0],Enemies[0],Enemies[0]],
          [Enemies[1]]]
 
-for wave in Waves:
+for monster_wave in Waves:
     i = 0
     row = []
-    for char_name in wave:
+    for char_name in monster_wave:
         if char_name == 'Dragon':
             Dragon = Character(i,'monster',char_name,60,6,40,0.1)
             row.append(Dragon)
@@ -743,7 +850,7 @@ for wave in Waves:
             Ogre = Character(i,'monster',char_name,20,2,8,0.6)
             row.append(Ogre)
     monster_group.append(row)
-    i = Waves.index(wave)
+    i = Waves.index(monster_wave)
     if DEBUG: print(f"""
 Index : {i}
     >""",', '.join([(str(x.char_name) + ' ID:' + str(x.id)) for x in monster_group[i]]))
@@ -752,8 +859,10 @@ Waves = monster_group
 Players = player_group
 Enemies = [Ogre, Dragon]
 
-if DEBUG: stats(player_group); stats(Enemies)
+# -
 
+
+if DEBUG: stats(player_group); stats(Enemies)
 
 FightSyst = Fight()
 
@@ -763,6 +872,12 @@ for wave_number in range(0,len(Waves)):
     FightSyst.main(wave_number)
 """
 
+
+################################################################
+#                                                              #
+#                    Statistics Explaination                   #
+#                                                              #
+################################################################
 
 """ liste des attaques: / Cooldown = can't play for x turn(s)
 Guerrier (Humain):
@@ -784,7 +899,7 @@ Guerisseur (??) :
 |   4. Defend           | Increase armor / Armor +30%. for one turn             |
 
 Mage (Arcaniste) :
-|   1. Fire Ball        | Basic Attack     (Chance to burn enemies ?)           |
+|   1. Fire Ball        | Basic Attack                                          |
 |   2. Weakening Spell  | Weak the Enemy / Enemy Strength -20%. for one turn    |
 |   3. Growing Roots    | Weak an Enemy  / Enemy Armor -20%. for one wave       |
 |   4. Defend           | Increase armor / Armor +30%. for one turn             |

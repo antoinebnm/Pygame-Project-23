@@ -1,6 +1,14 @@
+################################################################
+#                                                              #
+#        PLEASE DONT PAY ATTENTION TO THIS CODE                #
+#                 ONLY FOR IDEAS TESTING                       #
+#                                                              #
+################################################################
+
 import time, sys
 from config import *
 
+# Counter / Clock system ?
 """Time = []
 Time.append(time.time())
 time.sleep(1)
@@ -10,6 +18,8 @@ print(Time[1])"""
 
 #print("Version: "+'.'.join([str(x) for x in sys.version_info if x in [3,11]]))
 
+
+# MultiThreading system // Deprecated
 """from concurrent.futures import ThreadPoolExecutor
 
 def run_io_tasks_in_parallel(tasks):

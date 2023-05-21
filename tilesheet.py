@@ -1,6 +1,11 @@
 from config import *
 from levels import *
 
+################################################################
+#                                                              #
+#                          Map Class                           #
+#                                                              #
+################################################################
 class Map:
 # Chargement de la map à automatiser avec interface
     def __init__(self):
@@ -16,11 +21,12 @@ class Map:
         self.offset = math.ceil(SCREEN_WIDTH / self.image.get_width()) + 1
         window.blit(self.image, screen)
     
-    def update(self,COUNTER):
-        pass
+    def update(self):
+        window.blit(self.image, screen)
+        pygame.display.update(screen)
 
-
-    def scroll_map(self, x):
+# SCROLL FUNC ==> Useless for now
+"""    def scroll_map(self, x):
         i=0
         while(i < self.offset):
             window.blit(self.image, (self.image.get_width() * i + self.scroll, 0))
@@ -32,4 +38,4 @@ class Map:
         if abs(self.scroll) > self.image.get_width():
             self.scroll = 0
 
-        pygame.display.update(screen)
+        pygame.display.update(screen)"""

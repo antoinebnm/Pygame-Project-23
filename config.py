@@ -1,7 +1,9 @@
+###################################################################
+#                                                                 #
+#                         Imports and Paths                       #
+#                                                                 #
+###################################################################
 import pygame, random, sys, math, random, time, csv, os, json, threading
-
-
-#from pygame.locals import *
 
 PATH = os.path.dirname(__file__)
 img_path = PATH + "/img/"
@@ -13,12 +15,13 @@ pygame.display.init()
 
 ###################################################################
 #                                                                 #
-#                        Window Settings                          #
+#                        Window Variables                         #
 #                                                                 #
 ###################################################################
 # 1600x900 | 1440×900 | 1280×720 
 SCREEN_WIDTH, SCREEN_HEIGHT = pygame.display.get_desktop_sizes()[0][0]*0.8,pygame.display.get_desktop_sizes()[0][1]*0.8
 LOWER_MARGIN = SCREEN_HEIGHT // 2.6
+CONSOLE_WIDTH = int(SCREEN_WIDTH * 0.6)
 SCREEN_HEIGHT -= LOWER_MARGIN
 
 
@@ -32,11 +35,19 @@ RESIZE = False
 DEBUG = False
 SAVE = False
 
+
+###################################################################
+#                                                                 #
+#                          Window Settings                        #
+#                                                                 #
+###################################################################
 if RESIZE:
     window = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT + LOWER_MARGIN),pygame.HWSURFACE | pygame.DOUBLEBUF | pygame.RESIZABLE)
 else:
     window = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT + LOWER_MARGIN),pygame.HWSURFACE | pygame.DOUBLEBUF)
-screen = pygame.rect.Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
+
+console = pygame.rect.Rect(SCREEN_WIDTH - CONSOLE_WIDTH, 0, CONSOLE_WIDTH, SCREEN_HEIGHT)
+screen = pygame.rect.Rect(0, 0, SCREEN_WIDTH - CONSOLE_WIDTH, SCREEN_HEIGHT)
 
 
 icon = pygame.image.load(img_path + 'icon.png')
@@ -66,7 +77,8 @@ def run_io_tasks_in_simultaneously(tasks):
                 pass
         
         executor.shutdown()
-"""
+"""     ⬇︎ HOW TO CALL FUCTION ⬇︎
+
 run_io_tasks_in_simultaneously([
     lambda: funcA(),
     lambda: funcB(),
@@ -89,7 +101,7 @@ class Color():
     cyan = '\u001b[36m'
 
 # PYGAME COLORS
-COLOR_UI = pygame.color.Color(20, 23, 37)
+COLOR_UI = pygame.color.Color(19, 22, 35)
 COLOR_WHITE = pygame.color.Color(255,255,255)
 COLOR_BLACK = pygame.color.Color(0,0,0)
 COLOR_MENU = pygame.color.Color(20,160,130)
@@ -97,24 +109,32 @@ COLOR_MENU = pygame.color.Color(20,160,130)
 
 ###################################################################
 #                                                                 #
-#                         Layers Levels                           #
+#                         Other Variables                         #
 #                                                                 #
 ###################################################################
 MAP_VIEW = 2
 
 GROUND_LEVEL = SCREEN_HEIGHT - ((LOWER_MARGIN)//(3.3)) - 8
 
-
-###################################################################
-#                                                                 #
-#                    MOVEMENTS and Charcaters                     #
-#                                                                 #
-###################################################################
 PLAYER_SPEED = SCREEN_WIDTH / 500
 PLAYER_RUN = SCREEN_WIDTH / 320
 UI_SCALE = (SCREEN_WIDTH*SCREEN_HEIGHT) // 810000
 
-PLAYER_CHARACTERS = ['warrior','elve','healer','mage'] # warrior, elve, mage, healer
+
+
+###################################################################
+#                                                                 #
+#                 Heroes, statistics and inventory                #
+#                                                                 #
+###################################################################
+# Guerrier, Chasseur, Guerisseur, Mage
+# Stats : [Health, Attack turn, Damage, Armor, Ammo]
+PLAYER_CHARACTERS = {
+    'Guerrier': [20,1,14,0.4, None],
+    'Chasseur': [18,3,12,0.8,5],
+    'Guerisseur': [16,5,8,1.1, None],
+    'Mage': [16,4,14,0.9, None]
+}
 
 HEROES_ACTIONS_BUFFS = {
     'Basic': None,
@@ -156,9 +176,3 @@ PLAYER_LEFT_KEY = pygame.K_LEFT
 PLAYER_RIGHT_KEY = pygame.K_RIGHT
 PLAYER_UP_KEY = pygame.K_UP
 PLAYER_DOWN_KEY = pygame.K_DOWN
-
-
-
-if DEBUG:
-    print('ground lvl',GROUND_LEVEL, 'lower marg.',LOWER_MARGIN)
-    print('width',SCREEN_WIDTH,'height',SCREEN_HEIGHT)

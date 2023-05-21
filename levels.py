@@ -1,5 +1,10 @@
 from config import *
 
+################################################################
+#                                                              #
+#     Levels Class / Get the map level --> Differents zones    #
+#                                                              #
+################################################################
 class Levels:
     def __init__(self, map_level):
         self.map = map_level
@@ -16,6 +21,7 @@ class Levels:
             self.layers.append(file)
         return self.layers
         
+# Load Order or Screen Printing / For Multiple Images Maps
     def load_order(self):
         load_order = []
         map_layers = self.layer_founder(self.map)

@@ -1,5 +1,11 @@
 from tilesheet import *
 
+
+################################################################
+#                                                              #
+#             Sprites Class / Characters Management            #
+#                                                              #
+################################################################
 class Sprite():
     def __init__(self, scale):
         self.sprite_animation = 'stand'
@@ -37,8 +43,8 @@ class Sprite():
     # PLAYERCHAR = warrior, archer, mage, healer
         self.team_sprites = []
         self.sprites_tilesets = []
-        for character in PLAYER_CHARACTERS:
-            i = self.num_tileset[PLAYER_CHARACTERS.index(character)]
+        for character in PLAYER_CHARACTERS.keys():
+            i = self.num_tileset[list(PLAYER_CHARACTERS.keys()).index(character)]
         # sprites_tilesets = all sprites tilesets | team_sprites = all sprites frames
             self.sprites_tilesets.append(self.load_tileset((character + '_' + str(self.num_tileset[i]) + '.png')))
             self.team_sprites.append(self.get_sprite(character, self.sprite_frame, self.facing_sprite))
@@ -59,14 +65,14 @@ class Sprite():
     
 # Fonction de récup. de tile, tout est dans le nom
     def get_sprite(self, table_name, x_char=1, y_char=12):
-        i = PLAYER_CHARACTERS.index(table_name)
+        i = list(PLAYER_CHARACTERS.keys()).index(table_name)
         return self.sprites_tilesets[i][x_char - 1][y_char - 1]
 
 # Dessiner le character sur l'écran (.blit)
     def draw_sprite(self,x,y):
         memory = []
-        for character in PLAYER_CHARACTERS:
-            i = PLAYER_CHARACTERS.index(character)
+        for character in PLAYER_CHARACTERS.keys():
+            i = list(PLAYER_CHARACTERS.keys()).index(character)
             memory.append(self.get_sprite(character, self.sprite_frame, self.facing_sprite))
             window.blit(self.team_sprites[i], (self.x + 90 - (i*30), self.y))
 
@@ -108,6 +114,7 @@ class Sprite():
         if self.sprite_animation == 'stand':
             self.sprite_frame = 1
 
+# Useless on 2D Map --> For 2.5 Map
     def movements(self):
         keys = pygame.key.get_pressed()
         pass

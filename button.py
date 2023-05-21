@@ -1,9 +1,15 @@
 import pygame 
 from config import *
 
-
+################################################################
+#                                                              #
+#   		   Buttons Management System Class   			   #
+#                                                              #
+################################################################
 class Button():
 	def __init__(self,x, y, image, scale=1):
+
+		# Check if button is an Image or just a Rectangle to control
 		if type(image) == pygame.rect.Rect:
 			self.image = image
 			self.rect = image
@@ -19,6 +25,7 @@ class Button():
 		
 		self.clicked = False
 
+# Print Button/ Rect on Screen and check if User Clicked on it
 	def check(self):
 		action = False
 	#draw button
