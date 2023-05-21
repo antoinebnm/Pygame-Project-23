@@ -3,7 +3,7 @@
 #                         Imports and Paths                       #
 #                                                                 #
 ###################################################################
-import pygame, random, sys, math, random, time, csv, os, json, threading
+import pygame, sys, math, random, time, csv, os, json, threading
 
 PATH = os.path.dirname(__file__)
 img_path = PATH + "/img/"
